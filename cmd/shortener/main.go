@@ -1,20 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
+	"url-shortener/internal/app/handler"
+	"url-shortener/internal/app/service"
+	"url-shortener/internal/app/storage"
 )
 
 func main() {
-	r := gin.Default()
+	st := storage.NewStorage()
+	sr := service.NewService(st)
+	h := handler.NewHandler(sr)
+	router := gin.Default()
+	router.POST("/", h.UpdateAndRetShort)
+	router.GET("/:id", h.RetLongUrl)
 
-	r.POST("/", func(c *gin.Context) {
-		body, _ := c.GetRawData() // получаем тело запроса в виде []byte
-		str := string(body)       // преобразовываем []byte в string
-		fmt.Println(str)          // выводим полученную строку в консоль
-
-		c.Status(200)
-	})
-
-	r.Run(":8080")
+	router.Run(":8080")
 }

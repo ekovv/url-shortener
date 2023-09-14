@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"url-shortener/internal/app/service"
 )
 
@@ -15,9 +16,23 @@ func NewHandler(service service.Service) *Handler {
 }
 
 func (s *Handler) UpdateAndRetShort(c *gin.Context) {
-	body, _ := c.GetRawData() // получаем тело запроса в виде []byte
-	str := string(body)       // преобразовываем []byte в string
-	fmt.Println(str)          // выводим полученную строку в консоль
+	body, _ := c.GetRawData()
+	str := string(body)
+	fmt.Println(str)
+	short, err := s.service.RetShort(str)
+	fmt.Println(short)
+	if err != nil {
+		return
+	}
+	c.String(http.StatusCreated, short)
+}
 
-	c.Status(200)
+func (s *Handler) RetLongUrl(c *gin.Context) {
+	id := c.Param("id")
+	long, err := s.service.RetLong(id)
+	if err != nil {
+		return
+	}
+	c.Redirect(http.StatusFound, long)
+
 }
