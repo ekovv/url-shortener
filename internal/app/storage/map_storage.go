@@ -13,8 +13,8 @@ func NewStorage() *Storage {
 	return &Storage{m: make(map[string]string)}
 }
 
-func (s *Storage) Set(path string, shortUrl string) error {
-	s.m[path] = shortUrl
+func (s *Storage) Set(path string, shortURL string) error {
+	s.m[path] = shortURL
 	return nil
 }
 

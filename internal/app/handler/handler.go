@@ -22,15 +22,17 @@ func (s *Handler) UpdateAndRetShort(c *gin.Context) {
 	short, err := s.service.RetShort(str)
 	fmt.Println(short)
 	if err != nil {
+		c.Status(http.StatusBadRequest)
 		return
 	}
 	c.String(http.StatusCreated, short)
 }
 
-func (s *Handler) RetLongUrl(c *gin.Context) {
+func (s *Handler) RetLongURL(c *gin.Context) {
 	id := c.Param("id")
 	long, err := s.service.RetLong(id)
 	if err != nil {
+		c.Status(http.StatusBadRequest)
 		return
 	}
 	c.Redirect(http.StatusFound, long)
