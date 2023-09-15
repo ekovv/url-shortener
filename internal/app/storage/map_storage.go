@@ -1,6 +1,9 @@
 package storage
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type Storage struct {
 	m map[string]string
@@ -24,8 +27,10 @@ func (s *Storage) GetShort(path string) (string, error) {
 }
 
 func (s *Storage) GetLong(urlShort string) (string, error) {
+	urlShort = "http://localhost:8080/" + urlShort
 	for key, val := range s.m {
 		if val == urlShort {
+			fmt.Println(key)
 			return key, nil
 		}
 	}
