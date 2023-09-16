@@ -15,5 +15,5 @@ func main() {
 	router.POST("/", h.UpdateAndRetShort)
 	router.GET("/:id", h.RetLongURL)
 
-	router.Run(":8080")
+	router.Run("localhost:8080")
 }
