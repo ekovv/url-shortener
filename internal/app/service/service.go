@@ -23,7 +23,7 @@ type Storage interface {
 }
 
 func (s *Service) RetShort(path string) (string, error) {
-	err := s.storage.Set(path, ReplaceURLOnShort(path))
+	err := s.storage.Set(path, ReplaceURLOnShort())
 	if err != nil {
 		return "", errors.New("invalid")
 	}
@@ -42,10 +42,10 @@ func (s *Service) RetLong(shortURL string) (string, error) {
 	return long, nil
 }
 
-func ReplaceURLOnShort(path string) string {
+func ReplaceURLOnShort() string {
 	rand.New(rand.NewSource(time.Now().UnixNano()))
-	url := path
-	shortLink := shortenLink(url)
+	shortLink := shortenLink()
+	shortLink = "http://localhost:8080/" + shortLink
 	return shortLink
 }
 
@@ -57,10 +57,7 @@ func generateRandomString(length int) string {
 	return string(randomString)
 }
 
-func shortenLink(url string) string {
-
+func shortenLink() string {
 	randomString := generateRandomString(7)
-	url = "http://localhost:8080/" + randomString
-
-	return url
+	return randomString
 }
