@@ -22,19 +22,22 @@ func (s *Handler) UpdateAndRetShort(c *gin.Context) {
 	short, err := s.service.RetShort(str)
 	fmt.Println(short)
 	if err != nil {
-		c.Status(http.StatusBadRequest)
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 	c.String(http.StatusCreated, short)
 }
 
-func (s *Handler) RetLongURL(c *gin.Context) {
+func (s *Handler) GetLongURL(c *gin.Context) {
 	id := c.Param("id")
 	long, err := s.service.RetLong(id)
 	if err != nil {
-		c.Status(http.StatusBadRequest)
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	c.Redirect(http.StatusFound, long)
+	c.Status(http.StatusFound)
+
+	// установка заголовка Location на нужный URL
+	c.Header("Location", long)
 
 }

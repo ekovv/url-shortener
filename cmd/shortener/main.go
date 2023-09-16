@@ -13,7 +13,7 @@ func main() {
 	h := handler.NewHandler(sr)
 	router := gin.Default()
 	router.POST("/", h.UpdateAndRetShort)
-	router.GET("/:id", h.RetLongURL)
+	router.GET("/:id", h.GetLongURL)
 
 	router.Run("localhost:8080")
 }

@@ -59,10 +59,9 @@ func generateRandomString(length int) string {
 
 func shortenLink(url string) string {
 	shortLink := url
-	if len(url) > 8 && url[:8] == "https://" {
-		randomString := generateRandomString(7)
-		shortLink = "http://localhost:8080/" + randomString
-	}
+
+	randomString := generateRandomString(7)
+	shortLink = "http://localhost:8080/" + randomString
 
 	return shortLink
 }
