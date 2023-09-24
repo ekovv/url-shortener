@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"url-shortener/internal/app/service"
+	"url-shortener/internal/app/domains"
 )
 
 type Handler struct {
-	service service.Service
+	service domains.Usecase
 }
 
-func NewHandler(service service.Service) *Handler {
+func NewHandler(service domains.Usecase) *Handler {
 	return &Handler{service: service}
 }
 
