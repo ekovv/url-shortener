@@ -2,7 +2,9 @@ package config
 
 import (
 	"flag"
+	"fmt"
 	"os"
+	"strings"
 )
 
 type Config struct {
@@ -29,7 +31,13 @@ func New() *Config {
 	}
 
 	return &Config{
-		Host:    *f.host,
-		BaseURL: *f.baseURL,
+		Host: *f.host,
+		BaseURL: func() string {
+			if strings.HasSuffix(*f.baseURL, "/") {
+				return *f.baseURL
+			}
+
+			return fmt.Sprintf("%s/", *f.baseURL)
+		}(),
 	}
 }
