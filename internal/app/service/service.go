@@ -4,16 +4,21 @@ import (
 	"errors"
 	"math/rand"
 	"time"
+	"url-shortener/config"
 )
 
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 type Service struct {
 	storage Storage
+	config  config.Config
 }
 
-func NewService(storage Storage) Service {
-	return Service{storage: storage}
+func NewService(storage Storage, config config.Config) Service {
+	return Service{
+		storage: storage,
+		config:  config,
+	}
 }
 
 type Storage interface {
@@ -23,15 +28,12 @@ type Storage interface {
 }
 
 func (s *Service) RetShort(path string) (string, error) {
-	err := s.storage.Set(path, ReplaceURLOnShort())
+	short := s.ReplaceURLOnShort()
+	err := s.storage.Set(path, short)
 	if err != nil {
 		return "", errors.New("invalid")
 	}
-	short, err := s.storage.GetShort(path)
-	if err != nil {
-		return "", errors.New("invalid")
-	}
-	return short, nil
+	return s.config.BaseURL + short, nil
 }
 
 func (s *Service) RetLong(shortURL string) (string, error) {
@@ -42,11 +44,9 @@ func (s *Service) RetLong(shortURL string) (string, error) {
 	return long, nil
 }
 
-func ReplaceURLOnShort() string {
+func (s *Service) ReplaceURLOnShort() string {
 	rand.New(rand.NewSource(time.Now().UnixNano()))
-	shortLink := shortenLink()
-	shortLink = "http://localhost:8080/" + shortLink
-	return shortLink
+	return shortenLink()
 }
 
 func generateRandomString(length int) string {

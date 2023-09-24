@@ -2,7 +2,6 @@ package storage
 
 import (
 	"errors"
-	"fmt"
 )
 
 type Storage struct {
@@ -14,7 +13,7 @@ func NewStorage() *Storage {
 }
 
 func (s *Storage) Set(path string, shortURL string) error {
-	s.m[path] = shortURL
+	s.m[shortURL] = path
 	return nil
 }
 
@@ -27,12 +26,10 @@ func (s *Storage) GetShort(path string) (string, error) {
 }
 
 func (s *Storage) GetLong(urlShort string) (string, error) {
-	urlShort = "http://localhost:8080/" + urlShort
-	for key, val := range s.m {
-		if val == urlShort {
-			fmt.Println(key)
-			return key, nil
-		}
+	long, ok := s.m[urlShort]
+	if !ok {
+		return "", errors.New("long url not found")
 	}
-	return "", errors.New("invalid")
+
+	return long, nil
 }
