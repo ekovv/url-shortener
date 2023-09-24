@@ -10,7 +10,7 @@ import (
 func main() {
 	st := storage.NewStorage()
 	sr := service.NewService(st)
-	h := handler.NewHandler(sr)
+	h := handler.NewHandler(&sr)
 	router := gin.Default()
 	router.POST("/", h.UpdateAndRetShort)
 	router.GET("/:id", h.GetLongURL)
