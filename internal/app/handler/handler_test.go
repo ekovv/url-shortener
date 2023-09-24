@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/http/httptest"
@@ -11,7 +12,7 @@ import (
 
 type serviceMock func(c *mocks.UseCase)
 
-func TestHandler_UpdateAndRetShort(t *testing.T) {
+func TestHandler_UpdateAndGetShort(t *testing.T) {
 
 	tests := []struct {
 		name        string
@@ -27,13 +28,19 @@ func TestHandler_UpdateAndRetShort(t *testing.T) {
 			},
 			wantCode: http.StatusCreated,
 		},
-		// TODO: only one test??? 2 for OK and 1 for error minimum
+		{
+			name: "BAD",
+			body: "12",
+			serviceMock: func(c *mocks.UseCase) {
+				c.Mock.On("GetShort", "12").Return("", errors.New("invalid")).Times(1)
+			},
+			wantCode: http.StatusBadRequest,
+		},
 	}
-
-	g := gin.Default()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			g := gin.Default()
 			service := mocks.NewUseCase(t)
 			h := NewHandler(service)
 			tt.serviceMock(service)
@@ -69,9 +76,16 @@ func TestHandler_GetLongURL(t *testing.T) {
 			},
 			wantCode: http.StatusTemporaryRedirect,
 		},
+		{
+			name:     "BAD",
+			shortURL: "aaa",
+			serviceMock: func(c *mocks.UseCase) {
+				c.Mock.On("GetLong", "aaa").Return("", errors.New("invalid id")).Times(1)
+			},
+			wantCode: http.StatusBadRequest,
+		},
 		// TODO: only one test??? 2 for OK and 1 for error minimum
 	}
-
 	g := gin.Default()
 
 	service := mocks.NewUseCase(t)
@@ -79,9 +93,9 @@ func TestHandler_GetLongURL(t *testing.T) {
 
 	path := "/:id"
 	g.GET(path, h.GetLongURL)
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
 			tt.serviceMock(service)
 
 			w := httptest.NewRecorder()
