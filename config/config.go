@@ -30,7 +30,7 @@ func New() *Config {
 		f.host = &envRunAddr
 	}
 	if envBaseAddr := os.Getenv("BASE_URL"); envBaseAddr != "" {
-		f.host = &envBaseAddr
+		f.baseURL = &envBaseAddr
 	}
 
 	return &Config{
