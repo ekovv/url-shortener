@@ -12,17 +12,9 @@ func NewStorage() *Storage {
 	return &Storage{m: make(map[string]string)}
 }
 
-func (s *Storage) Set(path string, shortURL string) error {
+func (s *Storage) SetPair(path string, shortURL string) error {
 	s.m[shortURL] = path
 	return nil
-}
-
-func (s *Storage) GetShort(path string) (string, error) {
-	str, ok := s.m[path]
-	if !ok {
-		return "", errors.New("invalid original url")
-	}
-	return str, nil
 }
 
 func (s *Storage) GetLong(urlShort string) (string, error) {

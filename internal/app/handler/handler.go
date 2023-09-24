@@ -8,18 +8,23 @@ import (
 )
 
 type Handler struct {
-	service domains.Usecase
+	service domains.UseCase
 }
 
-func NewHandler(service domains.Usecase) *Handler {
+func NewHandler(service domains.UseCase) *Handler {
 	return &Handler{service: service}
 }
 
-func (s *Handler) UpdateAndRetShort(c *gin.Context) {
-	body, _ := c.GetRawData()
+func (s *Handler) UpdateAndGetShort(c *gin.Context) {
+	body, err := c.GetRawData()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+
+	}
 	str := string(body)
 	fmt.Println(str)
-	short, err := s.service.RetShort(str)
+	short, err := s.service.GetShort(str)
 	fmt.Println(short)
 	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -30,9 +35,9 @@ func (s *Handler) UpdateAndRetShort(c *gin.Context) {
 
 func (s *Handler) GetLongURL(c *gin.Context) {
 	id := c.Param("id")
-	long, err := s.service.RetLong(id)
+	long, err := s.service.GetLong(id)
 	if err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
 	c.Status(http.StatusTemporaryRedirect)

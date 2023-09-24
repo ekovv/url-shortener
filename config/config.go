@@ -19,8 +19,10 @@ type F struct {
 
 var f F
 
+const addr = "localhost:8080"
+
 func init() {
-	f.host = flag.String("a", "localhost:8080", "-a=host")
+	f.host = flag.String("a", addr, "-a=host")
 	f.baseURL = flag.String("b", "http://localhost:8080/", "-b=base")
 }
 
