@@ -29,6 +29,9 @@ func New() *Config {
 	if envRunAddr := os.Getenv("SERVER_ADDRESS"); envRunAddr != "" {
 		f.host = &envRunAddr
 	}
+	if envBaseAddr := os.Getenv("BASE_URL"); envBaseAddr != "" {
+		f.host = &envBaseAddr
+	}
 
 	return &Config{
 		Host: *f.host,
