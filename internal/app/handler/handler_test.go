@@ -84,7 +84,6 @@ func TestHandler_GetLongURL(t *testing.T) {
 			},
 			wantCode: http.StatusBadRequest,
 		},
-		// TODO: only one test??? 2 for OK and 1 for error minimum
 	}
 	g := gin.Default()
 
