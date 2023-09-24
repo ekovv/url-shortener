@@ -36,8 +36,6 @@ func (s *Handler) GetLongURL(c *gin.Context) {
 		return
 	}
 	c.Status(http.StatusTemporaryRedirect)
-
-	// установка заголовка Location на нужный URL
 	c.Header("Location", long)
 
 }
