@@ -80,6 +80,7 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
+	c.Status(http.StatusCreated)
 	c.Header("Content-Type", "application/json")
 	c.Writer.Write(bytes)
 
