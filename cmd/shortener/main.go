@@ -26,6 +26,7 @@ func main() {
 	myLog.Sugar = *logger.Sugar()
 	router.POST("/", h.UpdateAndGetShort)
 	router.GET("/:id", h.GetLongURL)
+	router.POST("/api/shorten", h.GetShortByJSON)
 
 	err = router.Run(conf.Host)
 	if err != nil {
