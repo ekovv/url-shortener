@@ -27,7 +27,7 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 	short, err := s.service.GetShort(str)
 	fmt.Println(short)
 	if err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
 	c.String(http.StatusCreated, short)
