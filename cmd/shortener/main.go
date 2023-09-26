@@ -20,6 +20,7 @@ func main() {
 	router := gin.Default()
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 	router.Use(myLog.HTTPLogger())
+
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		panic(err)
