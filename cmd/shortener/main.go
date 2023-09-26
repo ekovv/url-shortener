@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"log"
@@ -17,6 +18,7 @@ func main() {
 	sr := service.NewService(st, *conf)
 	h := handler.NewHandler(&sr)
 	router := gin.Default()
+	router.Use(gzip.Gzip(gzip.DefaultCompression))
 	router.Use(myLog.HTTPLogger())
 	logger, err := zap.NewDevelopment()
 	if err != nil {
