@@ -32,19 +32,22 @@ func (s *FileStorage) SaveInFile(short string, long string) error {
 		return err
 	}
 	type inFile struct {
-		Uuid  string `json:"uuid"`
+		UUID  string `json:"uuid"`
 		Short string `json:"short_url"`
 		Long  string `json:"original_url"`
 	}
 	var f inFile
 	count := 1
-	f.Uuid = strconv.Itoa(count)
+	f.UUID = strconv.Itoa(count)
 	count += 1
 	f.Short = short
 	f.Long = long
 	writer := bufio.NewWriter(s.File)
 	defer s.File.Close()
 	jsonData, err := json.Marshal(f)
+	if err != nil {
+		return err
+	}
 
 	_, err = writer.WriteString(string(jsonData) + "\n")
 	if err != nil {
@@ -63,7 +66,7 @@ func (s *FileStorage) GetLong(short string) (string, error) {
 	}
 	defer s.File.Close()
 	type inFile struct {
-		Uuid  string `json:"uuid"`
+		UUID  string `json:"uuid"`
 		Short string `json:"short_url"`
 		Long  string `json:"original_url"`
 	}
