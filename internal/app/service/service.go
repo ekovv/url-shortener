@@ -2,33 +2,45 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 	"url-shortener/config"
+	"url-shortener/internal/app/storage"
 )
 
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 type Service struct {
-	storage Storage
-	config  config.Config
+	mapStorage  MapStorage
+	fileStorage storage.FileStorage
+	config      config.Config
 }
 
-func NewService(storage Storage, config config.Config) Service {
+func NewService(storageMap MapStorage, storageFile storage.FileStorage, config config.Config) Service {
 	return Service{
-		storage: storage,
-		config:  config,
+		mapStorage:  storageMap,
+		fileStorage: storageFile,
+		config:      config,
 	}
 }
 
-type Storage interface {
+type MapStorage interface {
 	SetPair(path string, shortURL string) error
 	GetLong(urlShort string) (string, error)
 }
 
 func (s *Service) GetShort(path string) (string, error) {
 	short := s.getShortURL()
-	err := s.storage.SetPair(path, short)
+	if s.config.Storage != "map" {
+		err := s.fileStorage.SaveInFile(short, path)
+		if err != nil {
+			fmt.Println("Not save in file")
+			return "", err
+		}
+		return short, nil
+	}
+	err := s.mapStorage.SetPair(path, short)
 	if err != nil {
 		return "", errors.New("invalid")
 	}
@@ -36,7 +48,7 @@ func (s *Service) GetShort(path string) (string, error) {
 }
 
 func (s *Service) GetLong(shortURL string) (string, error) {
-	long, err := s.storage.GetLong(shortURL)
+	long, err := s.mapStorage.GetLong(shortURL)
 	if err != nil {
 		return "", errors.New("invalid")
 	}

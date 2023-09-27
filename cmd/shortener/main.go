@@ -14,8 +14,9 @@ import (
 
 func main() {
 	conf := config.New()
-	st := storage.NewStorage()
-	sr := service.NewService(st, *conf)
+	stM := storage.NewStorage()
+	stF := storage.NewFileStorage(conf.Storage)
+	sr := service.NewService(stM, *stF, *conf)
 	h := handler.NewHandler(&sr)
 	router := gin.Default()
 	router.Use(h.Decompressed())
