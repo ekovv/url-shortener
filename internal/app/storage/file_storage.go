@@ -54,3 +54,38 @@ func (s *FileStorage) SaveInFile(short string, long string) error {
 	writer.Flush()
 	return nil
 }
+
+func (s *FileStorage) GetLong(short string) (string, error) {
+	err := s.Open()
+	if err != nil {
+		fmt.Println("Not open")
+		return "", err
+	}
+	defer s.File.Close()
+	type inFile struct {
+		Uuid  string `json:"uuid"`
+		Short string `json:"short_url"`
+		Long  string `json:"original_url"`
+	}
+	scanner := bufio.NewScanner(s.File)
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		var f inFile
+
+		err := json.Unmarshal(line, &f)
+		if err != nil {
+			fmt.Println("Bad json in File", err)
+			continue
+		}
+
+		if f.Short == short {
+			return short, nil
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Bad file")
+		return "", err
+	}
+	return "", nil
+}

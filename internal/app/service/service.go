@@ -38,7 +38,7 @@ func (s *Service) GetShort(path string) (string, error) {
 			fmt.Println("Not save in file")
 			return "", err
 		}
-		return short, nil
+		return s.config.BaseURL + short, nil
 	}
 	err := s.mapStorage.SetPair(path, short)
 	if err != nil {
@@ -48,6 +48,14 @@ func (s *Service) GetShort(path string) (string, error) {
 }
 
 func (s *Service) GetLong(shortURL string) (string, error) {
+	if s.config.Storage != "map" {
+		long, err := s.fileStorage.GetLong(shortURL)
+		if err != nil {
+			fmt.Println("file without short")
+			return "", err
+		}
+		return long, nil
+	}
 	long, err := s.mapStorage.GetLong(shortURL)
 	if err != nil {
 		return "", errors.New("invalid")
