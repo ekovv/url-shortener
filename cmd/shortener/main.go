@@ -18,6 +18,7 @@ func main() {
 	sr := service.NewService(st, *conf)
 	h := handler.NewHandler(&sr)
 	router := gin.Default()
+	router.Use(h.Decompressed())
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 	router.Use(myLog.HTTPLogger())
 

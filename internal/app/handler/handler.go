@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
+	"strings"
 	"url-shortener/internal/app/domains"
 )
 
@@ -18,6 +20,10 @@ func NewHandler(service domains.UseCase) *Handler {
 }
 
 func (s *Handler) UpdateAndGetShort(c *gin.Context) {
+	acceptEncoding := c.GetHeader("accept-encoding")
+	if strings.Contains(acceptEncoding, "gzip") {
+		c.Header("Content-Encoding", "gzip")
+	}
 	body, err := c.GetRawData()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
@@ -36,6 +42,10 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 }
 
 func (s *Handler) GetLongURL(c *gin.Context) {
+	acceptEncoding := c.GetHeader("accept-encoding")
+	if strings.Contains(acceptEncoding, "gzip") {
+		c.Header("Content-Encoding", "gzip")
+	}
 	id := c.Param("id")
 	long, err := s.service.GetLong(id)
 	if err != nil {
@@ -48,6 +58,10 @@ func (s *Handler) GetLongURL(c *gin.Context) {
 }
 
 func (s *Handler) GetShortByJSON(c *gin.Context) {
+	acceptEncoding := c.GetHeader("accept-encoding")
+	if strings.Contains(acceptEncoding, "gzip") {
+		c.Header("Content-Encoding", "gzip")
+	}
 	b, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		fmt.Println("JSON NOT GOOD")
@@ -84,4 +98,27 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	c.Writer.Write(bytes)
 
+}
+
+func (s *Handler) Decompressed() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.Request.Header.Get("Content-Encoding") == "gzip" {
+			reader, err := gzip.NewReader(c.Request.Body)
+			if err != nil {
+				c.AbortWithStatus(http.StatusBadRequest)
+				return
+			}
+			defer reader.Close()
+
+			buf := new(strings.Builder)
+			_, err = io.Copy(buf, reader)
+			if err != nil {
+				c.AbortWithStatus(http.StatusInternalServerError)
+				return
+			}
+			c.Request.Body = io.NopCloser(strings.NewReader(buf.String()))
+			c.Request.Header.Set("Content-Length", string(rune(len(buf.String()))))
+		}
+		c.Next()
+	}
 }
