@@ -82,7 +82,7 @@ func (s *FileStorage) GetLong(short string) (string, error) {
 		}
 
 		if f.Short == short {
-			return short, nil
+			return f.Long, nil
 		}
 	}
 
