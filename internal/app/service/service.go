@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	_ "github.com/lib/pq"
 	"math/rand"
 	"time"
 	"url-shortener/config"
@@ -62,6 +63,20 @@ func (s *Service) GetLong(shortURL string) (string, error) {
 	}
 	return long, nil
 }
+
+//func (s *Service) CheckConnection(conn string) error {
+//	db, err := sql.Open("postgres", "postgres://username:password@localhost/dbname?sslmode=disable")
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	defer db.Close()
+//
+//	err = db.Ping()
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	return nil
+//}
 
 func (s *Service) getShortURL() string {
 	randomString := generateRandomString(7)
