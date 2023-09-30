@@ -97,6 +97,4 @@ func (s *Handler) GetConnection(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 	}
 	c.Status(http.StatusOK)
-	return
-
 }

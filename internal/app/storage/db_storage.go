@@ -17,7 +17,9 @@ func NewDBStorage(config config.Config) (*DBStorage, error) {
 	}
 	defer db.Close()
 
-	s := &DBStorage{}
+	s := &DBStorage{
+		conn: db,
+	}
 
 	return s, s.CheckConnection()
 }
