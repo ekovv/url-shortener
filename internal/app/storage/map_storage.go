@@ -8,6 +8,13 @@ type MapStorage struct {
 	m map[string]string
 }
 
+func (s *MapStorage) CheckConnection() error {
+	if s.m == nil {
+		return errors.New("map nil")
+	}
+	return nil
+}
+
 func (s *MapStorage) Close() error {
 	s.m = nil
 	return nil

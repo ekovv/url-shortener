@@ -90,3 +90,13 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	c.Writer.Write(bytes)
 }
+
+func (s *Handler) GetConnection(c *gin.Context) {
+	err := s.service.CheckConn()
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+	}
+	c.Status(http.StatusOK)
+	return
+
+}

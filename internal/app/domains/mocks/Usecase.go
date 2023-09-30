@@ -9,6 +9,20 @@ type UseCase struct {
 	mock.Mock
 }
 
+// CheckConn provides a mock function with given fields:
+func (_m *UseCase) CheckConn() error {
+	ret := _m.Called()
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // GetLong provides a mock function with given fields: shortURL
 func (_m *UseCase) GetLong(shortURL string) (string, error) {
 	ret := _m.Called(shortURL)

@@ -12,9 +12,8 @@ import (
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 type Service struct {
-	Storage     storage.Storage
-	fileStorage storage.FileStorage
-	config      config.Config
+	Storage storage.Storage
+	config  config.Config
 }
 
 func NewService(storage storage.Storage, config config.Config) Service {
@@ -39,6 +38,14 @@ func (s *Service) GetLong(shortURL string) (string, error) {
 		return "", errors.New("invalid")
 	}
 	return long, nil
+}
+
+func (s *Service) CheckConn() error {
+	err := s.Storage.CheckConnection()
+	if err != nil {
+		return errors.New("not connected")
+	}
+	return nil
 }
 
 func (s *Service) getShortURL() string {

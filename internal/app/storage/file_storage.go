@@ -14,6 +14,14 @@ type FileStorage struct {
 	count int
 }
 
+func (s *FileStorage) CheckConnection() error {
+	if s.File == nil {
+		return fmt.Errorf("file not open")
+	}
+	return nil
+
+}
+
 func NewFileStorage(path string) (*FileStorage, error) {
 	fs := &FileStorage{
 		Path:  path,

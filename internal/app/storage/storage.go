@@ -9,6 +9,7 @@ type Storage interface {
 	Save(shortURL string, path string) error
 	GetLong(short string) (string, error)
 	Close() error
+	CheckConnection() error
 }
 
 func New(cfg config.Config) (Storage, error) {
