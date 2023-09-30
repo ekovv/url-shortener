@@ -22,7 +22,7 @@ func (s *DbStorage) Close() error {
 	return nil
 }
 
-func NewDbStorage(config config.Config) (*DbStorage, error) {
+func NewDBStorage(config config.Config) (*DbStorage, error) {
 	db, err := sql.Open("postgres", config.DB)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to db %w", err)

@@ -14,7 +14,7 @@ type Storage interface {
 func New(cfg config.Config) (Storage, error) {
 	switch cfg.Storage {
 	case "db":
-		d, err := NewDbStorage(cfg)
+		d, err := NewDBStorage(cfg)
 		if err != nil {
 			return nil, fmt.Errorf("error creating db storage: %v", err)
 		}
