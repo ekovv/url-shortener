@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"url-shortener/config"
-	"url-shortener/internal/app/domains"
-	myLog "url-shortener/internal/app/logger"
+	"url-shortener/internal/domains"
+	myLog "url-shortener/internal/logger"
 )
 
 type Handler struct {

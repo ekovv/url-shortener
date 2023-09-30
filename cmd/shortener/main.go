@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"url-shortener/config"
-	"url-shortener/internal/app/handler"
-	myLog "url-shortener/internal/app/logger"
-	"url-shortener/internal/app/service"
-	"url-shortener/internal/app/storage"
+	"url-shortener/internal/handler"
+	myLog "url-shortener/internal/logger"
+	"url-shortener/internal/service"
+	"url-shortener/internal/storage"
 )
 
 func main() {

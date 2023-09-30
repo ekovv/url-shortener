@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 	"url-shortener/config"
-	"url-shortener/internal/app/storage"
+	"url-shortener/internal/storage"
 )
 
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

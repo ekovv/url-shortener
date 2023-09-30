@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 	"url-shortener/config"
-	"url-shortener/internal/app/domains/mocks"
+	"url-shortener/internal/domains/mocks"
 )
 
 type serviceMock func(c *mocks.UseCase)
