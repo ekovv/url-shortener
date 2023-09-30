@@ -20,6 +20,7 @@ func main() {
 	}
 	sr := service.NewService(stM, *stF, *conf)
 	h := handler.NewHandler(&sr, *conf)
+
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		panic(err)
