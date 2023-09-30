@@ -25,8 +25,8 @@ const addr = "localhost:8080"
 
 func init() {
 	f.host = flag.String("a", addr, "-a=host")
-	f.baseURL = flag.String("b", "http://localhost:8080/", "-b=base")
-	f.storage = flag.String("f", "map", "-f=storage")
+	f.baseURL = flag.String("b", "http://localhost:8080/", "-b=base") // TODO: add const
+	f.storage = flag.String("f", "map", "-f=storage")                 // TODO: add const
 }
 
 func New() *Config {

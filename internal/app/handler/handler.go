@@ -1,29 +1,42 @@
 package handler
 
 import (
-	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
-	"io"
 	"net/http"
-	"strings"
+	"url-shortener/config"
 	"url-shortener/internal/app/domains"
+	myLog "url-shortener/internal/app/logger"
 )
 
 type Handler struct {
 	service domains.UseCase
+	engine  *gin.Engine
+	config  config.Config
 }
 
-func NewHandler(service domains.UseCase) *Handler {
-	return &Handler{service: service}
+func NewHandler(service domains.UseCase, conf config.Config) *Handler {
+	router := gin.Default()
+	h := &Handler{
+		service: service,
+		config:  conf,
+		engine:  router,
+	}
+	router.Use(h.AcceptEncoding())
+	router.Use(h.Decompressed())
+	router.Use(gzip.Gzip(gzip.DefaultCompression))
+	router.Use(myLog.HTTPLogger())
+	Route(router, h)
+	return h
+}
+
+func (s *Handler) Start() {
+	s.engine.Run(s.config.Host)
 }
 
 func (s *Handler) UpdateAndGetShort(c *gin.Context) {
-	acceptEncoding := c.GetHeader("accept-encoding")
-	if strings.Contains(acceptEncoding, "gzip") {
-		c.Header("Content-Encoding", "gzip")
-	}
 	body, err := c.GetRawData()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
@@ -31,9 +44,7 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 
 	}
 	str := string(body)
-	fmt.Println(str)
 	short, err := s.service.GetShort(str)
-	fmt.Println(short)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
@@ -42,10 +53,6 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 }
 
 func (s *Handler) GetLongURL(c *gin.Context) {
-	acceptEncoding := c.GetHeader("accept-encoding")
-	if strings.Contains(acceptEncoding, "gzip") {
-		c.Header("Content-Encoding", "gzip")
-	}
 	id := c.Param("id")
 	long, err := s.service.GetLong(id)
 	if err != nil {
@@ -58,23 +65,8 @@ func (s *Handler) GetLongURL(c *gin.Context) {
 }
 
 func (s *Handler) GetShortByJSON(c *gin.Context) {
-	acceptEncoding := c.GetHeader("accept-encoding")
-	if strings.Contains(acceptEncoding, "gzip") {
-		c.Header("Content-Encoding", "gzip")
-	}
-	b, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		fmt.Println("JSON NOT GOOD")
-		c.Status(http.StatusBadRequest)
-		return
-	}
-	type uriJSON struct {
-		URI string `json:"url,omitempty"`
-		Res string `json:"result"`
-	}
-
 	var js uriJSON
-	err = json.Unmarshal(b, &js)
+	err := c.ShouldBindJSON(&js)
 	if err != nil {
 		fmt.Println("JSON NOT GOOD")
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
@@ -97,28 +89,4 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 	c.Status(http.StatusCreated)
 	c.Header("Content-Type", "application/json")
 	c.Writer.Write(bytes)
-
-}
-
-func (s *Handler) Decompressed() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if c.Request.Header.Get("Content-Encoding") == "gzip" {
-			reader, err := gzip.NewReader(c.Request.Body)
-			if err != nil {
-				c.AbortWithStatus(http.StatusBadRequest)
-				return
-			}
-			defer reader.Close()
-
-			buf := new(strings.Builder)
-			_, err = io.Copy(buf, reader)
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			c.Request.Body = io.NopCloser(strings.NewReader(buf.String()))
-			c.Request.Header.Set("Content-Length", string(rune(len(buf.String()))))
-		}
-		c.Next()
-	}
 }

@@ -9,12 +9,22 @@ import (
 )
 
 type FileStorage struct {
-	Path string
-	File *os.File
+	Path  string
+	File  *os.File
+	count int
 }
 
-func NewFileStorage(path string) *FileStorage {
-	return &FileStorage{Path: path}
+func NewFileStorage(path string) (*FileStorage, error) {
+	fs := &FileStorage{
+		Path:  path,
+		count: 1,
+	}
+	err := fs.Open()
+	if err != nil {
+		return nil, fmt.Errorf("error opening file storage %w", err)
+	}
+
+	return fs, nil
 }
 
 func (s *FileStorage) Open() error {
@@ -26,37 +36,35 @@ func (s *FileStorage) Open() error {
 	return nil
 }
 
+func (s *FileStorage) Close() error {
+	return s.File.Close()
+}
+
 func (s *FileStorage) SaveInFile(short string, long string) error {
-	err := s.Open()
-	if err != nil {
-		return err
-	}
-	defer s.File.Close()
 
-	type inFile struct {
-		UUID  string `json:"uuid"`
-		Short string `json:"short_url"`
-		Long  string `json:"original_url"`
+	var f = inFile{
+		UUID:  strconv.Itoa(s.count),
+		Short: short,
+		Long:  long,
 	}
-	var f inFile
-
-	count := 1
-	f.UUID = strconv.Itoa(count)
-	count += 1
-	f.Short = short
-	f.Long = long
-	writer := bufio.NewWriter(s.File)
+	s.count += 1
 	jsonData, err := json.Marshal(f)
 	if err != nil {
 		return err
 	}
-	_, err = writer.WriteString(string(jsonData) + "\n")
+
+	_, err = s.File.Write(append(jsonData, byte('\n')))
 	if err != nil {
-		fmt.Println("Not write")
 		return err
 	}
-	writer.Flush()
+
 	return nil
+}
+
+type inFile struct {
+	UUID  string `json:"uuid"`
+	Short string `json:"short_url"`
+	Long  string `json:"original_url"`
 }
 
 func (s *FileStorage) GetLong(short string) (string, error) {
@@ -66,12 +74,6 @@ func (s *FileStorage) GetLong(short string) (string, error) {
 		return "", err
 	}
 	defer s.File.Close()
-
-	type inFile struct {
-		UUID  string `json:"uuid"`
-		Short string `json:"short_url"`
-		Long  string `json:"original_url"`
-	}
 
 	scanner := bufio.NewScanner(s.File)
 	for scanner.Scan() {
