@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"url-shortener/config"
 	"url-shortener/internal/app/domains/mocks"
 )
 
@@ -43,7 +44,7 @@ func TestHandler_UpdateAndGetShort(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := gin.Default()
 			service := mocks.NewUseCase(t)
-			h := NewHandler(service)
+			h := NewHandler(service, config.Config{})
 			tt.serviceMock(service)
 
 			path := "/t"
@@ -89,7 +90,7 @@ func TestHandler_GetLongURL(t *testing.T) {
 	g := gin.Default()
 
 	service := mocks.NewUseCase(t)
-	h := NewHandler(service)
+	h := NewHandler(service, config.Config{})
 
 	path := "/:id"
 	g.GET(path, h.GetLongURL)
@@ -148,7 +149,7 @@ func TestHandler_GetShortByJSON(t *testing.T) {
 			g := gin.Default()
 
 			service := mocks.NewUseCase(t)
-			h := NewHandler(service)
+			h := NewHandler(service, config.Config{})
 
 			path := "/api/shorten"
 			g.POST(path, h.GetShortByJSON)
