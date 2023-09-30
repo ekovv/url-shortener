@@ -40,7 +40,7 @@ func (s *FileStorage) Close() error {
 	return s.File.Close()
 }
 
-func (s *FileStorage) SaveInFile(short string, long string) error {
+func (s *FileStorage) Save(short string, long string) error {
 
 	var f = inFile{
 		UUID:  strconv.Itoa(s.count),

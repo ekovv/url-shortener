@@ -12,14 +12,13 @@ import (
 
 func main() {
 	conf := config.New()
-	stM := storage.NewStorage()
-	stF, err := storage.NewFileStorage(conf.Storage)
+	stM, err := storage.New(conf)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	sr := service.NewService(stM, *stF, *conf)
-	h := handler.NewHandler(&sr, *conf)
+	sr := service.NewService(stM, conf)
+	h := handler.NewHandler(&sr, conf)
 
 	logger, err := zap.NewDevelopment()
 	if err != nil {
@@ -28,4 +27,5 @@ func main() {
 	defer logger.Sync()
 	myLog.Sugar = *logger.Sugar()
 	h.Start()
+	stM.Close()
 }
