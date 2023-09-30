@@ -6,35 +6,35 @@ import (
 	"url-shortener/config"
 )
 
-type DbStorage struct {
+type DBStorage struct {
 	conn *sql.DB
 }
 
-func NewDBStorage(config config.Config) (*DbStorage, error) {
+func NewDBStorage(config config.Config) (*DBStorage, error) {
 	db, err := sql.Open("postgres", config.DB)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to db %w", err)
 	}
 	defer db.Close()
 
-	s := &DbStorage{}
+	s := &DBStorage{}
 
 	return s, s.CheckConnection()
 }
 
-func (s *DbStorage) Save(shortURL string, path string) error {
+func (s *DBStorage) Save(shortURL string, path string) error {
 	return nil
 }
 
-func (s *DbStorage) GetLong(short string) (string, error) {
+func (s *DBStorage) GetLong(short string) (string, error) {
 	return "", nil
 }
 
-func (s *DbStorage) Close() error {
+func (s *DBStorage) Close() error {
 	return nil
 }
 
-func (s *DbStorage) CheckConnection() error {
+func (s *DBStorage) CheckConnection() error {
 	if err := s.conn.Ping(); err != nil {
 		return fmt.Errorf("failed to connect to db %w", err)
 	}
