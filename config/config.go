@@ -10,11 +10,13 @@ import (
 type Config struct {
 	Host    string
 	BaseURL string
+	Storage string
 }
 
 type F struct {
 	host    *string
 	baseURL *string
+	storage *string
 }
 
 var f F
@@ -23,7 +25,8 @@ const addr = "localhost:8080"
 
 func init() {
 	f.host = flag.String("a", addr, "-a=host")
-	f.baseURL = flag.String("b", "http://localhost:8080/", "-b=base")
+	f.baseURL = flag.String("b", "http://localhost:8080/", "-b=base") // TODO: add const
+	f.storage = flag.String("f", "map", "-f=storage")                 // TODO: add const
 }
 
 func New() *Config {
@@ -33,6 +36,9 @@ func New() *Config {
 	}
 	if envBaseAddr := os.Getenv("BASE_URL"); envBaseAddr != "" {
 		f.baseURL = &envBaseAddr
+	}
+	if envStorage := os.Getenv("FILE_STORAGE_PATH"); envStorage != "" {
+		f.storage = &envStorage
 	}
 
 	return &Config{
@@ -44,5 +50,6 @@ func New() *Config {
 
 			return fmt.Sprintf("%s/", *f.baseURL)
 		}(),
+		Storage: *f.storage,
 	}
 }

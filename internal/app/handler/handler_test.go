@@ -1,12 +1,14 @@
 package handler
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"url-shortener/config"
 	"url-shortener/internal/app/domains/mocks"
 )
 
@@ -42,7 +44,7 @@ func TestHandler_UpdateAndGetShort(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := gin.Default()
 			service := mocks.NewUseCase(t)
-			h := NewHandler(service)
+			h := NewHandler(service, config.Config{})
 			tt.serviceMock(service)
 
 			path := "/t"
@@ -88,7 +90,7 @@ func TestHandler_GetLongURL(t *testing.T) {
 	g := gin.Default()
 
 	service := mocks.NewUseCase(t)
-	h := NewHandler(service)
+	h := NewHandler(service, config.Config{})
 
 	path := "/:id"
 	g.GET(path, h.GetLongURL)
@@ -100,6 +102,64 @@ func TestHandler_GetLongURL(t *testing.T) {
 			w := httptest.NewRecorder()
 			request := httptest.NewRequest(http.MethodGet, "/"+tt.shortURL, nil)
 			// создаём новый Recorder
+
+			g.ServeHTTP(w, request)
+
+			if w.Code != tt.wantCode {
+				t.Errorf("got %d, want %d", w.Code, tt.wantCode)
+			}
+		})
+	}
+}
+
+func TestHandler_GetShortByJSON(t *testing.T) {
+	type jso struct {
+		URI string `json:"url"`
+	}
+	tests := []struct {
+		name        string
+		json        jso
+		serviceMock serviceMock
+		wantCode    int
+	}{
+		{
+			name: "OK1",
+			json: jso{
+				URI: "https://ya.ru",
+			},
+			serviceMock: func(c *mocks.UseCase) {
+				c.Mock.On("GetShort", "https://ya.ru").Return("af3gyhj2", nil).Times(1)
+			},
+			wantCode: http.StatusCreated,
+		},
+		{
+			name: "BAD",
+			json: jso{
+				URI: "as",
+			},
+			serviceMock: func(c *mocks.UseCase) {
+				c.Mock.On("GetShort", "as").Return("", errors.New("invalid json")).Times(1)
+			},
+			wantCode: http.StatusBadRequest,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := gin.Default()
+
+			service := mocks.NewUseCase(t)
+			h := NewHandler(service, config.Config{})
+
+			path := "/api/shorten"
+			g.POST(path, h.GetShortByJSON)
+			tt.serviceMock(service)
+			b, err := json.Marshal(tt.json)
+			if err != nil {
+				return
+			}
+			w := httptest.NewRecorder()
+			request := httptest.NewRequest(http.MethodPost, "/api/shorten", strings.NewReader(string(b)))
 
 			g.ServeHTTP(w, request)
 
