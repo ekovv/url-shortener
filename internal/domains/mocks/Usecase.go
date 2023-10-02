@@ -65,6 +65,27 @@ func (_m *UseCase) GetShort(path string) (string, error) {
 	return r0, r1
 }
 
+// SaveLog provides a mock function with given fields: id, path
+func (_m *UseCase) SaveLog(id string, path string) (string, error) {
+	ret := _m.Called(id, path)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(string, string) string); ok {
+		r0 = rf(id, path)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(id, path)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type mockConstructorTestingTNewUseCase interface {
 	mock.TestingT
 	Cleanup(func())
