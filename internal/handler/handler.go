@@ -109,7 +109,7 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		return
 	}
 	for _, i := range jB {
-		short, err := s.service.SaveLog(i.Id, i.Origin)
+		short, err := s.service.SaveLog(i.ID, i.Origin)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return
@@ -118,11 +118,11 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		i.Origin = ""
 		res = append(res, i)
 	}
-	//short, err := s.service.SaveLog(batch.Id, batch.Origin)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-		return
-	}
+	//short, err := s.service.SaveLog(batch.ID, batch.Origin)
+	//if err != nil {
+	//	c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	//	return
+	//}
 	//bytes, err := json.MarshalIndent(i, "", "    ")
 	//if err != nil {
 	//	fmt.Println("JSON NOT GOOD")
