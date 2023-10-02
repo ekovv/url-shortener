@@ -98,3 +98,30 @@ func (s *Handler) GetConnection(c *gin.Context) {
 	}
 	c.Status(http.StatusOK)
 }
+
+func (s *Handler) GetBatch(c *gin.Context) {
+	var batch jBatch
+	var res jBatchRes
+	err := c.ShouldBindJSON(&batch)
+	if err != nil {
+		fmt.Println("JSON NOT GOOD")
+		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
+	short, err := s.service.SaveLog(batch.Id, batch.Origin)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
+	res.Id = batch.Id
+	res.Short = short
+	bytes, err := json.MarshalIndent(res, "", "    ")
+	if err != nil {
+		fmt.Println("JSON NOT GOOD")
+		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
+	c.Status(http.StatusCreated)
+	c.Header("Content-Type", "application/json")
+	c.Writer.Write(bytes)
+}

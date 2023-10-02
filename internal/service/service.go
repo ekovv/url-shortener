@@ -48,6 +48,14 @@ func (s *Service) CheckConn() error {
 	return nil
 }
 
+func (s *Service) SaveLog(id string, path string) (string, error) {
+	err := s.Storage.Save(id, path)
+	if err != nil {
+		return "", errors.New("failed to save in db")
+	}
+	return s.config.BaseURL + id, nil
+}
+
 func (s *Service) getShortURL() string {
 	randomString := generateRandomString(7)
 	return randomString

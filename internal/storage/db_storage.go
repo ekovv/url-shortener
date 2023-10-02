@@ -51,7 +51,7 @@ func (s *DBStorage) Save(shortURL string, path string) error {
 }
 
 func (s *DBStorage) GetLong(short string) (string, error) {
-	query := "SELECT original FROM urls WHERE name = $1"
+	query := "SELECT original FROM urls WHERE short = $1"
 	var original string
 	err := s.conn.QueryRow(query, short).Scan(&original)
 	if err != nil {
