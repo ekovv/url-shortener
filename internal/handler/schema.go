@@ -7,7 +7,8 @@ type uriJSON struct {
 
 type jBatch struct {
 	Id     string `json:"correlation_id"`
-	Origin string `json:"original_url"`
+	Origin string `json:"original_url,omitempty"`
+	Short  string `json:"short_url,omitempty"`
 }
 
 type jBatchRes struct {

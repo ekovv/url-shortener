@@ -100,28 +100,38 @@ func (s *Handler) GetConnection(c *gin.Context) {
 }
 
 func (s *Handler) GetBatch(c *gin.Context) {
-	var batch jBatch
-	var res jBatchRes
-	err := c.ShouldBindJSON(&batch)
+	var jB []jBatch
+	var res []jBatch
+	err := c.ShouldBindJSON(&jB)
 	if err != nil {
 		fmt.Println("JSON NOT GOOD")
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	short, err := s.service.SaveLog(batch.Id, batch.Origin)
+	for _, i := range jB {
+		short, err := s.service.SaveLog(i.Id, i.Origin)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+		i.Short = short
+		i.Origin = ""
+		res = append(res, i)
+	}
+	//short, err := s.service.SaveLog(batch.Id, batch.Origin)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	res.Id = batch.Id
-	res.Short = short
-	bytes, err := json.MarshalIndent(res, "", "    ")
-	if err != nil {
-		fmt.Println("JSON NOT GOOD")
-		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-		return
-	}
+	//bytes, err := json.MarshalIndent(i, "", "    ")
+	//if err != nil {
+	//	fmt.Println("JSON NOT GOOD")
+	//	c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	//	return
+	//}
+	//res = append(res, string(bytes))
 	c.Status(http.StatusCreated)
 	c.Header("Content-Type", "application/json")
-	c.Writer.Write(bytes)
+	c.JSON(http.StatusCreated, res)
+	//c.Writer.Write(bytes)
 }
