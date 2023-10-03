@@ -10,8 +10,3 @@ type jBatch struct {
 	Origin string `json:"original_url,omitempty"`
 	Short  string `json:"short_url,omitempty"`
 }
-
-type jBatchRes struct {
-	ID    string `json:"correlation_id"`
-	Short string `json:"short_url"`
-}
