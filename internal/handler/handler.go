@@ -138,17 +138,6 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		i.Origin = ""
 		res = append(res, i)
 	}
-	//short, err := s.service.SaveLog(batch.ID, batch.Origin)
-	//if err != nil {
-	//	c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-	//	return
-	//}
-	//bytes, err := json.MarshalIndent(i, "", "    ")
-	//if err != nil {
-	//	fmt.Println("JSON NOT GOOD")
-	//	c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-	//	return
-	//}
 	//res = append(res, string(bytes))
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusCreated, res)
