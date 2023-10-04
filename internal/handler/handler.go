@@ -50,6 +50,7 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 	if err != nil {
 		if errors.Is(err, storage.ErrHave) {
 			c.String(http.StatusConflict, short)
+			return
 		}
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
@@ -131,7 +132,7 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		i.Origin = ""
 		res = append(res, i)
 	}
-	if flag == true {
+	if flag != false {
 		c.Header("Content-Type", "application/json")
 		c.JSON(http.StatusConflict, res)
 		return
