@@ -132,7 +132,7 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		i.Origin = ""
 		res = append(res, i)
 	}
-	if flag != false {
+	if flag {
 		c.Header("Content-Type", "application/json")
 		c.JSON(http.StatusConflict, res)
 		return
@@ -149,7 +149,6 @@ func (s *Handler) GetBatch(c *gin.Context) {
 	//	return
 	//}
 	//res = append(res, string(bytes))
-	c.Status(http.StatusCreated)
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusCreated, res)
 	//c.Writer.Write(bytes)
