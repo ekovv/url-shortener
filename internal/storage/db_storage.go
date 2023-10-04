@@ -42,7 +42,7 @@ func NewDBStorage(config config.Config) (*DBStorage, error) {
 }
 
 func (s *DBStorage) Save(shortURL string, path string) error {
-	insertQuery := `INSERT INTO urls(original, short) VALUES ($1, $2) ON CONFLICT (original) DO NOTHING `
+	insertQuery := `INSERT INTO urls(original, short) VALUES ($1, $2) `
 	_, err := s.conn.Exec(insertQuery, path, shortURL)
 	if err != nil {
 		return err
