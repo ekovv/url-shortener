@@ -76,7 +76,6 @@ func (s *FileStorage) GetShortIfHave(path string) (string, error) {
 		return "", err
 	}
 	defer s.File.Close()
-
 	scanner := bufio.NewScanner(s.File)
 	for scanner.Scan() {
 		line := scanner.Bytes()
