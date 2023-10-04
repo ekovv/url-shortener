@@ -81,6 +81,19 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 	short, err := s.service.GetShort(js.URI)
 	fmt.Println(short)
 	if err != nil {
+		if errors.Is(err, storage.ErrHave) {
+			js.Res = short
+			js.URI = ""
+			bytes, err := json.MarshalIndent(js, "", "    ")
+			if err != nil {
+				fmt.Println("JSON NOT GOOD")
+				c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+				return
+			}
+			c.Status(http.StatusConflict)
+			c.Header("Content-Type", "application/json")
+			c.Writer.Write(bytes)
+		}
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
@@ -114,28 +127,15 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	flag := false
 	for _, i := range jB {
 		short, err := s.service.SaveLog(i.ID, i.Origin)
 		if err != nil {
-			if errors.Is(err, storage.ErrHave) {
-				i.Short = short
-				i.Origin = ""
-				res = append(res, i)
-				flag = true
-				continue
-			}
 			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return
 		}
 		i.Short = short
 		i.Origin = ""
 		res = append(res, i)
-	}
-	if flag {
-		c.Header("Content-Type", "application/json")
-		c.JSON(http.StatusConflict, res)
-		return
 	}
 	//short, err := s.service.SaveLog(batch.ID, batch.Origin)
 	//if err != nil {
