@@ -93,6 +93,7 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 			c.Status(http.StatusConflict)
 			c.Header("Content-Type", "application/json")
 			c.Writer.Write(bytes)
+			return
 		}
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
@@ -151,5 +152,5 @@ func (s *Handler) GetBatch(c *gin.Context) {
 	//res = append(res, string(bytes))
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusCreated, res)
-	//c.Writer.Write(bytes)
+
 }
