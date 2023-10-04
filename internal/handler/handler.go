@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
@@ -9,6 +10,7 @@ import (
 	"url-shortener/config"
 	"url-shortener/internal/domains"
 	myLog "url-shortener/internal/logger"
+	"url-shortener/internal/storage"
 )
 
 type Handler struct {
@@ -46,6 +48,9 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 	str := string(body)
 	short, err := s.service.GetShort(str)
 	if err != nil {
+		if errors.Is(err, storage.ErrHave) {
+			c.String(http.StatusConflict, short)
+		}
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
@@ -108,15 +113,28 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
+	flag := false
 	for _, i := range jB {
 		short, err := s.service.SaveLog(i.ID, i.Origin)
 		if err != nil {
-			c.JSON(http.StatusConflict, res)
+			if errors.Is(err, storage.ErrHave) {
+				i.Short = short
+				i.Origin = ""
+				res = append(res, i)
+				flag = true
+				continue
+			}
+			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return
 		}
 		i.Short = short
 		i.Origin = ""
 		res = append(res, i)
+	}
+	if flag == true {
+		c.Header("Content-Type", "application/json")
+		c.JSON(http.StatusConflict, res)
+		return
 	}
 	//short, err := s.service.SaveLog(batch.ID, batch.Origin)
 	//if err != nil {

@@ -69,6 +69,35 @@ func (s *FileStorage) Save(short string, long string) error {
 	return nil
 }
 
+func (s *FileStorage) GetShortIfHave(path string) (string, error) {
+	err := s.Open()
+	if err != nil {
+		fmt.Println("Not open")
+		return "", err
+	}
+	defer s.File.Close()
+
+	scanner := bufio.NewScanner(s.File)
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		var f inFile
+		err := json.Unmarshal(line, &f)
+		if err != nil {
+			fmt.Println("Bad json in File", err)
+			continue
+		}
+		if f.Long == path {
+			return f.Short, nil
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Bad file")
+		return "", err
+	}
+	return "", nil
+}
+
 type inFile struct {
 	UUID  string `json:"uuid"`
 	Short string `json:"short_url"`

@@ -7,6 +7,7 @@ import (
 
 type Storage interface {
 	Save(shortURL string, path string) error
+	GetShortIfHave(path string) (string, error)
 	GetLong(short string) (string, error)
 	Close() error
 	CheckConnection() error

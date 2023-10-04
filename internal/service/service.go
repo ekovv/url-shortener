@@ -27,6 +27,13 @@ func (s *Service) GetShort(path string) (string, error) {
 	short := s.getShortURL()
 	err := s.Storage.Save(short, path)
 	if err != nil {
+		if errors.Is(err, storage.ErrHave) {
+			short, err := s.Storage.GetShortIfHave(path)
+			if err != nil {
+				return "", err
+			}
+			return s.config.BaseURL + short, storage.ErrHave
+		}
 		return "", err
 	}
 	return s.config.BaseURL + short, nil
@@ -51,6 +58,13 @@ func (s *Service) CheckConn() error {
 func (s *Service) SaveLog(id string, path string) (string, error) {
 	err := s.Storage.Save(id, path)
 	if err != nil {
+		if errors.Is(err, storage.ErrHave) {
+			short, err := s.Storage.GetShortIfHave(path)
+			if err != nil {
+				return "", err
+			}
+			return s.config.BaseURL + short, storage.ErrHave
+		}
 		return "", errors.New("failed to save in db")
 	}
 	return s.config.BaseURL + id, nil

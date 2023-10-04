@@ -29,6 +29,15 @@ func (s *MapStorage) Save(shortURL string, path string) error {
 	return nil
 }
 
+func (s *MapStorage) GetShortIfHave(path string) (string, error) {
+	short, ok := s.m[path]
+	if !ok {
+		return "", errors.New("short url not found")
+	}
+
+	return short, nil
+}
+
 func (s *MapStorage) GetLong(urlShort string) (string, error) {
 	long, ok := s.m[urlShort]
 	if !ok {

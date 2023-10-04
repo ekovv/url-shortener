@@ -2,10 +2,12 @@ package storage
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"url-shortener/config"
 )
@@ -41,13 +43,32 @@ func NewDBStorage(config config.Config) (*DBStorage, error) {
 	return s, s.CheckConnection()
 }
 
+var ErrHave = errors.New("already have")
+
 func (s *DBStorage) Save(shortURL string, path string) error {
-	insertQuery := `INSERT INTO urls(original, short) VALUES ($1, $2) `
+	insertQuery := `INSERT INTO urls(original, short) VALUES ($1, $2)`
 	_, err := s.conn.Exec(insertQuery, path, shortURL)
 	if err != nil {
-		return err
+		var e *pq.Error
+		if errors.As(err, &e) {
+			if e.Code == "23505" {
+				fmt.Println("Ошибка: запись уже существует")
+				return ErrHave
+			}
+			return err
+		}
 	}
 	return nil
+}
+
+func (s *DBStorage) GetShortIfHave(path string) (string, error) {
+	query := "SELECT short FROM urls WHERE original = $1"
+	var short string
+	err := s.conn.QueryRow(query, path).Scan(&short)
+	if err != nil {
+		return "", err
+	}
+	return short, nil
 }
 
 func (s *DBStorage) GetLong(short string) (string, error) {
