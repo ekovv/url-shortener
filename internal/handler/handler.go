@@ -111,7 +111,10 @@ func (s *Handler) GetBatch(c *gin.Context) {
 	for _, i := range jB {
 		short, err := s.service.SaveLog(i.ID, i.Origin)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+			i.Short = short
+			i.Origin = ""
+			res = append(res, i)
+			c.JSON(http.StatusConflict, res)
 			return
 		}
 		i.Short = short
