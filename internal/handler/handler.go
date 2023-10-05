@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"net/http"
 	"url-shortener/config"
 	"url-shortener/internal/domains"
@@ -17,6 +18,7 @@ type Handler struct {
 	service domains.UseCase
 	engine  *gin.Engine
 	config  config.Config
+	logger  zap.Logger
 }
 
 func NewHandler(service domains.UseCase, conf config.Config) *Handler {
@@ -48,7 +50,7 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 	str := string(body)
 	short, err := s.service.GetShort(str)
 	if err != nil {
-		if errors.Is(err, storage.ErrHave) {
+		if errors.Is(err, storage.ErrAlreadyExists) {
 			c.String(http.StatusConflict, short)
 			return
 		}
@@ -74,19 +76,19 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 	var js uriJSON
 	err := c.ShouldBindJSON(&js)
 	if err != nil {
-		fmt.Println("JSON NOT GOOD")
+		s.logger.Error("BAD JSON")
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
 	short, err := s.service.GetShort(js.URI)
 	fmt.Println(short)
 	if err != nil {
-		if errors.Is(err, storage.ErrHave) {
+		if errors.Is(err, storage.ErrAlreadyExists) {
 			js.Res = short
 			js.URI = ""
 			bytes, err := json.MarshalIndent(js, "", "    ")
 			if err != nil {
-				fmt.Println("JSON NOT GOOD")
+				s.logger.Error("BAD JSON")
 				c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 				return
 			}
@@ -102,7 +104,7 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 	js.URI = ""
 	bytes, err := json.MarshalIndent(js, "", "    ")
 	if err != nil {
-		fmt.Println("JSON NOT GOOD")
+		s.logger.Error("BAD JSON")
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
@@ -120,16 +122,16 @@ func (s *Handler) GetConnection(c *gin.Context) {
 }
 
 func (s *Handler) GetBatch(c *gin.Context) {
-	var jB []jBatch
+	var input []jBatch
 	var res []jBatch
-	err := c.ShouldBindJSON(&jB)
+	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		fmt.Println("JSON NOT GOOD")
+		s.logger.Error("BAD JSON")
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	for _, i := range jB {
-		short, err := s.service.SaveLog(i.ID, i.Origin)
+	for _, i := range input {
+		short, err := s.service.SaveWithoutGenerate(i.ID, i.Origin)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return

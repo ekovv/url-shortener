@@ -42,7 +42,7 @@ func NewDBStorage(config config.Config) (*DBStorage, error) {
 	return s, s.CheckConnection()
 }
 
-var ErrHave = errors.New("already have")
+var ErrAlreadyExists = errors.New("already have")
 
 func (s *DBStorage) Save(shortURL string, path string) error {
 	insertQuery := `INSERT INTO urls(original, short) VALUES ($1, $2)`
@@ -52,7 +52,7 @@ func (s *DBStorage) Save(shortURL string, path string) error {
 		if errors.As(err, &e) {
 			if e.Code == "23505" {
 				fmt.Println("Ошибка: запись уже существует")
-				return ErrHave
+				return ErrAlreadyExists
 			}
 			return err
 		}

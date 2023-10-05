@@ -5,5 +5,5 @@ type UseCase interface {
 	GetShort(path string) (string, error)
 	GetLong(shortURL string) (string, error)
 	CheckConn() error
-	SaveLog(id string, path string) (string, error)
+	SaveWithoutGenerate(id string, path string) (string, error)
 }

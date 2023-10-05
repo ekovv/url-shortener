@@ -66,7 +66,7 @@ func (_m *UseCase) GetShort(path string) (string, error) {
 }
 
 // SaveLog provides a mock function with given fields: id, path
-func (_m *UseCase) SaveLog(id string, path string) (string, error) {
+func (_m *UseCase) SaveWithoutGenerate(id string, path string) (string, error) {
 	ret := _m.Called(id, path)
 
 	var r0 string

@@ -2,14 +2,15 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	_ "github.com/lib/pq"
+	"github.com/speps/go-hashids/v2"
 	"math/rand"
+	"strconv"
 	"time"
 	"url-shortener/config"
 	"url-shortener/internal/storage"
 )
-
-const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 type Service struct {
 	Storage storage.Storage
@@ -27,12 +28,12 @@ func (s *Service) GetShort(path string) (string, error) {
 	short := s.getShortURL()
 	err := s.Storage.Save(short, path)
 	if err != nil {
-		if errors.Is(err, storage.ErrHave) {
+		if errors.Is(err, storage.ErrAlreadyExists) {
 			short, err := s.Storage.GetShortIfHave(path)
 			if err != nil {
 				return "", err
 			}
-			return s.config.BaseURL + short, storage.ErrHave
+			return s.config.BaseURL + short, storage.ErrAlreadyExists
 		}
 		return "", err
 	}
@@ -55,31 +56,48 @@ func (s *Service) CheckConn() error {
 	return nil
 }
 
-func (s *Service) SaveLog(id string, path string) (string, error) {
+func (s *Service) SaveWithoutGenerate(id string, path string) (string, error) {
 	err := s.Storage.Save(id, path)
 	if err != nil {
-		if errors.Is(err, storage.ErrHave) {
+		if errors.Is(err, storage.ErrAlreadyExists) {
 			short, err := s.Storage.GetShortIfHave(path)
 			if err != nil {
 				return "", err
 			}
-			return s.config.BaseURL + short, storage.ErrHave
+			return s.config.BaseURL + short, storage.ErrAlreadyExists
 		}
-		return "", errors.New("failed to save in db")
+		return "", fmt.Errorf("failed to save in db: %w", err)
 	}
 	return s.config.BaseURL + id, nil
 }
 
 func (s *Service) getShortURL() string {
-	randomString := generateRandomString(7)
-	return randomString
+	hd := hashids.NewData()
+	hd.MinLength = 30
+	h, _ := hashids.NewWithData(hd)
+	generator := rand.New(rand.NewSource(time.Now().UnixNano()))
+	var list []int
+	for i := 0; i < 2; i++ {
+		n := generator.Int63()
+		s := strconv.FormatInt(n, 10)
+		res, err := strconv.Atoi(s)
+		if err != nil {
+			return ""
+		}
+		list = append(list, res)
+	}
+	e, err := h.Encode(list)
+	if err != nil {
+		return ""
+	}
+	return e
 }
 
-func generateRandomString(length int) string {
-	rand.New(rand.NewSource(time.Now().UnixNano()))
-	randomString := make([]byte, length)
-	for i := range randomString {
-		randomString[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(randomString)
-}
+//func generateRandomString(length int) string {
+//	rand.New(rand.NewSource(time.Now().UnixNano()))
+//	randomInt := make([]byte, length)
+//	for i := range randomInt {
+//		randomInt[i] = letters[rand.Intn(len(letters))]
+//	}
+//	return string(randomString)
+//}
