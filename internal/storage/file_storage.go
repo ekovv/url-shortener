@@ -14,6 +14,14 @@ type FileStorage struct {
 	count int
 }
 
+func (s *FileStorage) CheckConnection() error {
+	if s.File == nil {
+		return fmt.Errorf("file not open")
+	}
+	return nil
+
+}
+
 func NewFileStorage(path string) (*FileStorage, error) {
 	fs := &FileStorage{
 		Path:  path,
@@ -40,7 +48,7 @@ func (s *FileStorage) Close() error {
 	return s.File.Close()
 }
 
-func (s *FileStorage) SaveInFile(short string, long string) error {
+func (s *FileStorage) Save(short string, long string) error {
 
 	var f = inFile{
 		UUID:  strconv.Itoa(s.count),
@@ -61,6 +69,32 @@ func (s *FileStorage) SaveInFile(short string, long string) error {
 	return nil
 }
 
+func (s *FileStorage) GetShortIfHave(path string) (string, error) {
+	err := s.Open()
+	if err != nil {
+		return "", fmt.Errorf("error opening file storage %w", err)
+	}
+	defer s.File.Close()
+	scanner := bufio.NewScanner(s.File)
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		var f inFile
+		err := json.Unmarshal(line, &f)
+		if err != nil {
+			_ = fmt.Errorf("error opening file storage %w", err)
+			continue
+		}
+		if f.Long == path {
+			return f.Short, nil
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return "", fmt.Errorf("error opening file storage %w", err)
+	}
+	return "", nil
+}
+
 type inFile struct {
 	UUID  string `json:"uuid"`
 	Short string `json:"short_url"`
@@ -70,8 +104,7 @@ type inFile struct {
 func (s *FileStorage) GetLong(short string) (string, error) {
 	err := s.Open()
 	if err != nil {
-		fmt.Println("Not open")
-		return "", err
+		return "", fmt.Errorf("error opening file storage %w", err)
 	}
 	defer s.File.Close()
 
@@ -81,7 +114,7 @@ func (s *FileStorage) GetLong(short string) (string, error) {
 		var f inFile
 		err := json.Unmarshal(line, &f)
 		if err != nil {
-			fmt.Println("Bad json in File", err)
+			_ = fmt.Errorf("error opening file storage %w", err)
 			continue
 		}
 		if f.Short == short {
@@ -90,8 +123,7 @@ func (s *FileStorage) GetLong(short string) (string, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Println("Bad file")
-		return "", err
+		return "", fmt.Errorf("error opening file storage %w", err)
 	}
 	return "", nil
 }

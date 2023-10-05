@@ -4,22 +4,21 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"url-shortener/config"
-	"url-shortener/internal/app/handler"
-	myLog "url-shortener/internal/app/logger"
-	"url-shortener/internal/app/service"
-	"url-shortener/internal/app/storage"
+	"url-shortener/internal/handler"
+	myLog "url-shortener/internal/logger"
+	"url-shortener/internal/service"
+	"url-shortener/internal/storage"
 )
 
 func main() {
 	conf := config.New()
-	stM := storage.NewStorage()
-	stF, err := storage.NewFileStorage(conf.Storage)
+	stM, err := storage.New(conf)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	sr := service.NewService(stM, *stF, *conf)
-	h := handler.NewHandler(&sr, *conf)
+	sr := service.NewService(stM, conf)
+	h := handler.NewHandler(&sr, conf)
 
 	logger, err := zap.NewDevelopment()
 	if err != nil {
@@ -28,4 +27,5 @@ func main() {
 	defer logger.Sync()
 	myLog.Sugar = *logger.Sugar()
 	h.Start()
+	stM.Close()
 }
