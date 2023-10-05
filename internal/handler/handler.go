@@ -133,6 +133,7 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		i.Short = short
 		i.Origin = ""
 		res = append(res, i)
+
 	}
 	//res = append(res, string(bytes))
 	c.Header("Content-Type", "application/json")
