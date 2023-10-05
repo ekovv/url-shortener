@@ -4,14 +4,16 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"go.uber.org/zap"
 	"os"
 	"strconv"
 )
 
 type FileStorage struct {
-	Path  string
-	File  *os.File
-	count int
+	Path   string
+	File   *os.File
+	count  int
+	logger zap.Logger
 }
 
 func (s *FileStorage) CheckConnection() error {
@@ -72,7 +74,7 @@ func (s *FileStorage) Save(short string, long string) error {
 func (s *FileStorage) GetShortIfHave(path string) (string, error) {
 	err := s.Open()
 	if err != nil {
-		fmt.Println("Not open")
+		s.logger.Error("BAD JSON")
 		return "", err
 	}
 	defer s.File.Close()
@@ -82,7 +84,7 @@ func (s *FileStorage) GetShortIfHave(path string) (string, error) {
 		var f inFile
 		err := json.Unmarshal(line, &f)
 		if err != nil {
-			fmt.Println("Bad json in File", err)
+			s.logger.Error("BAD JSON")
 			continue
 		}
 		if f.Long == path {
@@ -91,7 +93,7 @@ func (s *FileStorage) GetShortIfHave(path string) (string, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Println("Bad file")
+		s.logger.Error("BAD File")
 		return "", err
 	}
 	return "", nil
@@ -106,7 +108,7 @@ type inFile struct {
 func (s *FileStorage) GetLong(short string) (string, error) {
 	err := s.Open()
 	if err != nil {
-		fmt.Println("Not open")
+		s.logger.Error("BAD Open")
 		return "", err
 	}
 	defer s.File.Close()
@@ -117,7 +119,7 @@ func (s *FileStorage) GetLong(short string) (string, error) {
 		var f inFile
 		err := json.Unmarshal(line, &f)
 		if err != nil {
-			fmt.Println("Bad json in File", err)
+			s.logger.Error("BAD JSON")
 			continue
 		}
 		if f.Short == short {
@@ -126,7 +128,7 @@ func (s *FileStorage) GetLong(short string) (string, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Println("Bad file")
+		s.logger.Error("BAD File")
 		return "", err
 	}
 	return "", nil

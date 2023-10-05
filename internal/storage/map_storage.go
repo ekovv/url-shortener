@@ -2,10 +2,12 @@ package storage
 
 import (
 	"errors"
+	"go.uber.org/zap"
 )
 
 type MapStorage struct {
-	m map[string]string
+	m      map[string]string
+	logger zap.Logger
 }
 
 func (s *MapStorage) CheckConnection() error {
