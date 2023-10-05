@@ -8,13 +8,11 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/lib/pq"
-	"go.uber.org/zap"
 	"url-shortener/config"
 )
 
 type DBStorage struct {
-	conn   *sql.DB
-	logger zap.Logger
+	conn *sql.DB
 }
 
 func NewDBStorage(config config.Config) (*DBStorage, error) {
@@ -26,7 +24,6 @@ func NewDBStorage(config config.Config) (*DBStorage, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create migrate driver, %w", err)
 	}
-
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://migration",
 		"url", driver)
@@ -53,7 +50,6 @@ func (s *DBStorage) Save(shortURL string, path string) error {
 		var e *pq.Error
 		if errors.As(err, &e) {
 			if e.Code == "23505" {
-				s.logger.Error("BAD JSON")
 				return ErrAlreadyExists
 			}
 			return err

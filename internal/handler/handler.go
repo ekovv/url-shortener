@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"net/http"
 	"url-shortener/config"
 	"url-shortener/internal/domains"
@@ -18,7 +17,6 @@ type Handler struct {
 	service domains.UseCase
 	engine  *gin.Engine
 	config  config.Config
-	logger  zap.Logger
 }
 
 func NewHandler(service domains.UseCase, conf config.Config) *Handler {
@@ -76,7 +74,6 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 	var js uriJSON
 	err := c.ShouldBindJSON(&js)
 	if err != nil {
-		s.logger.Error("BAD JSON")
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
@@ -88,7 +85,6 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 			js.URI = ""
 			bytes, err := json.MarshalIndent(js, "", "    ")
 			if err != nil {
-				s.logger.Error("BAD JSON")
 				c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 				return
 			}
@@ -104,7 +100,6 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 	js.URI = ""
 	bytes, err := json.MarshalIndent(js, "", "    ")
 	if err != nil {
-		s.logger.Error("BAD JSON")
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
@@ -126,15 +121,14 @@ func (s *Handler) GetBatch(c *gin.Context) {
 	var res []jBatch
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		s.logger.Error("BAD JSON")
+		_ = fmt.Errorf("error opening file storage %w", err)
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
 	for _, i := range input {
 		short, err := s.service.SaveWithoutGenerate(i.ID, i.Origin)
-		if err != nil {
+		if err != nil && errors.Is(err, storage.ErrAlreadyExists) {
 			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-			return
 		}
 		i.Short = short
 		i.Origin = ""
