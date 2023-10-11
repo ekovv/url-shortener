@@ -5,7 +5,7 @@ import (
 )
 
 type MapStorage struct {
-	m map[string]string
+	m map[string]map[string]string
 }
 
 func (s *MapStorage) CheckConnection() error {
@@ -21,28 +21,39 @@ func (s *MapStorage) Close() error {
 }
 
 func NewMapStorage() *MapStorage {
-	return &MapStorage{m: make(map[string]string)}
+	return &MapStorage{m: make(map[string]map[string]string)}
 }
 
-func (s *MapStorage) Save(shortURL string, path string) error {
-	s.m[shortURL] = path
+func (s *MapStorage) Save(user string, shortURL string, path string) error {
+	s.m[user][shortURL] = path
 	return nil
 }
 
-func (s *MapStorage) GetShortIfHave(path string) (string, error) {
-	short, ok := s.m[path]
+func (s *MapStorage) GetShortIfHave(user string, path string) (string, error) {
+	short, ok := s.m[user][path]
 	if !ok {
-		return "", errors.New("short url not found")
+		return "", errors.New("Short url not found")
 	}
 
 	return short, nil
 }
 
-func (s *MapStorage) GetLong(urlShort string) (string, error) {
-	long, ok := s.m[urlShort]
+func (s *MapStorage) GetLong(user string, urlShort string) (string, error) {
+	long, ok := s.m[user][urlShort]
 	if !ok {
 		return "", errors.New("long url not found")
 	}
 
 	return long, nil
+}
+
+func (s *MapStorage) GetAll(user string) ([]URL, error) {
+	var result []URL
+	for key, value := range s.m[user] {
+		url := URL{}
+		url.Original = value
+		url.Short = key
+		result = append(result, url)
+	}
+	return result, nil
 }

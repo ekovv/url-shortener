@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"net/http"
 	"url-shortener/config"
 	"url-shortener/internal/domains"
@@ -45,8 +46,15 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 		return
 
 	}
+	var user string
+	token, err := c.Request.Cookie("token")
+	if err == nil {
+		user = token.Value
+	} else {
+		user = s.SetTokenAndGetIfExist(c)
+	}
 	str := string(body)
-	short, err := s.service.GetShort(str)
+	short, err := s.service.GetShort(user, str)
 	if err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
 			c.String(http.StatusConflict, short)
@@ -60,7 +68,14 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 
 func (s *Handler) GetLongURL(c *gin.Context) {
 	id := c.Param("id")
-	long, err := s.service.GetLong(id)
+	var user string
+	token, err := c.Request.Cookie("token")
+	if err == nil {
+		user = token.Value
+	} else {
+		user = s.SetTokenAndGetIfExist(c)
+	}
+	long, err := s.service.GetLong(user, id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
@@ -77,7 +92,14 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	short, err := s.service.GetShort(js.URI)
+	var user string
+	token, err := c.Request.Cookie("token")
+	if err == nil {
+		user = token.Value
+	} else {
+		user = s.SetTokenAndGetIfExist(c)
+	}
+	short, err := s.service.GetShort(user, js.URI)
 	fmt.Println(short)
 	if err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
@@ -125,8 +147,16 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
+	var user string
+	token, err := c.Request.Cookie("token")
+	if err == nil {
+		user = token.Value
+	} else {
+		user = s.SetTokenAndGetIfExist(c)
+		c.Status(http.StatusUnauthorized)
+	}
 	for _, i := range input {
-		short, err := s.service.SaveWithoutGenerate(i.ID, i.Origin)
+		short, err := s.service.SaveWithoutGenerate(user, i.ID, i.Origin)
 		if err != nil && errors.Is(err, storage.ErrAlreadyExists) {
 			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		}
@@ -139,4 +169,40 @@ func (s *Handler) GetBatch(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusCreated, res)
 
+}
+
+func (s *Handler) GetAll(c *gin.Context) {
+	var user string
+	token, err := c.Request.Cookie("token")
+	if err == nil {
+		user = token.Value
+	} else {
+		user = s.SetTokenAndGetIfExist(c)
+	}
+	urlsFrom, err := s.service.GetAllUrls(user)
+	if err != nil {
+		c.Status(http.StatusNoContent)
+		fmt.Errorf("error getting")
+		return
+	}
+	var res []jBatch
+	for _, i := range urlsFrom {
+		batch := jBatch{}
+		batch.Origin = i.Original
+		batch.Short = i.Short
+		res = append(res, batch)
+	}
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusCreated, res)
+}
+
+func (s *Handler) SetTokenAndGetIfExist(c *gin.Context) string {
+	newToken := uuid.New().String()
+	cookie := &http.Cookie{
+		Name:  "token",
+		Value: newToken,
+		Path:  "/",
+	}
+	http.SetCookie(c.Writer, cookie)
+	return cookie.Value
 }

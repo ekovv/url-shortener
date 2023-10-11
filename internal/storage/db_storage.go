@@ -43,9 +43,9 @@ func NewDBStorage(config config.Config) (*DBStorage, error) {
 
 var ErrAlreadyExists = errors.New("already have")
 
-func (s *DBStorage) Save(shortURL string, path string) error {
-	insertQuery := `INSERT INTO urls(original, short) VALUES ($1, $2)`
-	_, err := s.conn.Exec(insertQuery, path, shortURL)
+func (s *DBStorage) Save(user string, shortURL string, path string) error {
+	insertQuery := `INSERT INTO urls(Original, Short, cookie) VALUES ($1, $2, $3)`
+	_, err := s.conn.Exec(insertQuery, path, shortURL, user)
 	if err != nil {
 		var e *pq.Error
 		if errors.As(err, &e) {
@@ -58,20 +58,20 @@ func (s *DBStorage) Save(shortURL string, path string) error {
 	return nil
 }
 
-func (s *DBStorage) GetShortIfHave(path string) (string, error) {
-	query := "SELECT short FROM urls WHERE original = $1"
+func (s *DBStorage) GetShortIfHave(user string, path string) (string, error) {
+	query := "SELECT Short FROM urls WHERE Original = $1 AND cookie = $2"
 	var short string
-	err := s.conn.QueryRow(query, path).Scan(&short)
+	err := s.conn.QueryRow(query, path, user).Scan(&short)
 	if err != nil {
 		return "", err
 	}
 	return short, nil
 }
 
-func (s *DBStorage) GetLong(short string) (string, error) {
-	query := "SELECT original FROM urls WHERE short = $1"
+func (s *DBStorage) GetLong(user string, short string) (string, error) {
+	query := "SELECT Original FROM urls WHERE Short = $1 AND cookie = $2"
 	var original string
-	err := s.conn.QueryRow(query, short).Scan(&original)
+	err := s.conn.QueryRow(query, short, user).Scan(&original)
 	if err != nil {
 		return "", err
 	}
@@ -87,4 +87,23 @@ func (s *DBStorage) CheckConnection() error {
 		return fmt.Errorf("failed to connect to db %w", err)
 	}
 	return nil
+}
+
+func (s *DBStorage) GetAll(user string) ([]URL, error) {
+	query := "SELECT Original, Short FROM urls WHERE cookie = $1"
+	var list []URL
+	rows, err := s.conn.Query(query, user)
+	if err != nil {
+		return nil, fmt.Errorf("failed to getall urls: %w", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		url := URL{}
+		err = rows.Scan(&url.Original, &url.Short)
+		if err != nil {
+			return nil, fmt.Errorf("failed to getall urls: %w", err)
+		}
+		list = append(list, url)
+	}
+	return list, nil
 }

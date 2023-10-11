@@ -26,7 +26,7 @@ func TestHandler_UpdateAndGetShort(t *testing.T) {
 			name: "OK1",
 			body: "https://ya.ru",
 			serviceMock: func(c *mocks.UseCase) {
-				c.Mock.On("GetShort", "https://ya.ru").Return("adh35Kof", nil).Times(1)
+				c.Mock.On("GetShort", "aa5a4e87-659a-4a9c-bf79-368410c4fd6a", "https://ya.ru").Return("adh35Kof", nil).Times(1)
 			},
 			wantCode: http.StatusCreated,
 		},
@@ -34,7 +34,7 @@ func TestHandler_UpdateAndGetShort(t *testing.T) {
 			name: "BAD",
 			body: "12",
 			serviceMock: func(c *mocks.UseCase) {
-				c.Mock.On("GetShort", "12").Return("", errors.New("invalid")).Times(1)
+				c.Mock.On("GetShort", "", "12").Return("", errors.New("invalid")).Times(1)
 			},
 			wantCode: http.StatusBadRequest,
 		},

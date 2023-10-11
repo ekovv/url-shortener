@@ -24,12 +24,12 @@ func NewService(storage storage.Storage, config config.Config) Service {
 	}
 }
 
-func (s *Service) GetShort(path string) (string, error) {
+func (s *Service) GetShort(user string, path string) (string, error) {
 	short := s.getShortURL()
-	err := s.Storage.Save(short, path)
+	err := s.Storage.Save(user, short, path)
 	if err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
-			short, err := s.Storage.GetShortIfHave(path)
+			short, err := s.Storage.GetShortIfHave(user, path)
 			if err != nil {
 				return "", err
 			}
@@ -40,8 +40,8 @@ func (s *Service) GetShort(path string) (string, error) {
 	return s.config.BaseURL + short, nil
 }
 
-func (s *Service) GetLong(shortURL string) (string, error) {
-	long, err := s.Storage.GetLong(shortURL)
+func (s *Service) GetLong(user string, shortURL string) (string, error) {
+	long, err := s.Storage.GetLong(user, shortURL)
 	if err != nil {
 		return "", errors.New("invalid")
 	}
@@ -56,11 +56,11 @@ func (s *Service) CheckConn() error {
 	return nil
 }
 
-func (s *Service) SaveWithoutGenerate(id string, path string) (string, error) {
-	err := s.Storage.Save(id, path)
+func (s *Service) SaveWithoutGenerate(user string, id string, path string) (string, error) {
+	err := s.Storage.Save(user, id, path)
 	if err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
-			short, err := s.Storage.GetShortIfHave(path)
+			short, err := s.Storage.GetShortIfHave(user, path)
 			if err != nil {
 				return "", err
 			}
@@ -93,11 +93,10 @@ func (s *Service) getShortURL() string {
 	return e
 }
 
-//func generateRandomString(length int) string {
-//	rand.New(rand.NewSource(time.Now().UnixNano()))
-//	randomInt := make([]byte, length)
-//	for i := range randomInt {
-//		randomInt[i] = letters[rand.Intn(len(letters))]
-//	}
-//	return string(randomString)
-//}
+func (s *Service) GetAllUrls(user string) ([]storage.URL, error) {
+	list, err := s.Storage.GetAll(user)
+	if err != nil {
+		return nil, fmt.Errorf("error getting %w", err)
+	}
+	return list, nil
+}

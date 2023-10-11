@@ -6,11 +6,12 @@ import (
 )
 
 type Storage interface {
-	Save(shortURL string, path string) error
-	GetShortIfHave(path string) (string, error)
-	GetLong(short string) (string, error)
+	Save(user string, shortURL string, path string) error
+	GetShortIfHave(user string, path string) (string, error)
+	GetLong(user string, short string) (string, error)
 	Close() error
 	CheckConnection() error
+	GetAll(user string) ([]URL, error)
 }
 
 func New(cfg config.Config) (Storage, error) {
