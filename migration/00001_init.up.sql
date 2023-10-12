@@ -1,7 +1,7 @@
 CREATE TABLE urls (
     id SERIAL PRIMARY KEY,
-    Original text NOT NULL,
-    Short text NOT NULL,
+    original text NOT NULL,
+    short text NOT NULL,
     cookie text NOT NULL
 );
 ALTER TABLE urls
