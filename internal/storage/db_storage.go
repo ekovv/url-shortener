@@ -58,10 +58,10 @@ func (s *DBStorage) Save(user string, shortURL string, path string) error {
 	return nil
 }
 
-func (s *DBStorage) GetShortIfHave(user string, path string) (string, error) {
+func (s *DBStorage) GetShortIfHave(_ string, path string) (string, error) {
 	query := "SELECT Short FROM urls WHERE Original = $1"
 	var short string
-	err := s.conn.QueryRow(query, path, user).Scan(&short)
+	err := s.conn.QueryRow(query, path).Scan(&short)
 	if err != nil {
 		return "", err
 	}
