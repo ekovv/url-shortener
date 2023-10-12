@@ -25,6 +25,7 @@ func NewMapStorage() *MapStorage {
 }
 
 func (s *MapStorage) Save(user string, shortURL string, path string) error {
+	s.m[user] = make(map[string]string)
 	s.m[user][shortURL] = path
 	return nil
 }
