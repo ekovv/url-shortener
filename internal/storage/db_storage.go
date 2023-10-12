@@ -73,7 +73,7 @@ func (s *DBStorage) GetLong(user string, short string) (string, error) {
 	var original string
 	err := s.conn.QueryRow(query, short, user).Scan(&original)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error: %w", err)
 	}
 	return original, nil
 }
