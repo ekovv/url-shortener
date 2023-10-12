@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"net/http"
+	"strconv"
 	"url-shortener/config"
 	"url-shortener/internal/domains"
 	myLog "url-shortener/internal/logger"
+	"url-shortener/internal/service"
 	"url-shortener/internal/storage"
 )
 
@@ -47,12 +48,15 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 
 	}
 	var user string
+	var id int
 	token, err := c.Request.Cookie("token")
 	if err == nil {
-		user = token.Value
+		id = s.service.SaveAndGetSessionMap(token.Value)
 	} else {
-		user = s.SetTokenAndGetIfExist(c)
+		newToken := s.SetSession(c)
+		id = s.service.SaveAndGetSessionMap(newToken)
 	}
+	user = strconv.Itoa(id)
 	str := string(body)
 	short, err := s.service.GetShort(user, str)
 	if err != nil {
@@ -67,15 +71,18 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 }
 
 func (s *Handler) GetLongURL(c *gin.Context) {
-	id := c.Param("id")
+	idOfParam := c.Param("id")
 	var user string
+	var id int
 	token, err := c.Request.Cookie("token")
 	if err == nil {
-		user = token.Value
+		id = s.service.SaveAndGetSessionMap(token.Value)
 	} else {
-		user = s.SetTokenAndGetIfExist(c)
+		newToken := s.SetSession(c)
+		id = s.service.SaveAndGetSessionMap(newToken)
 	}
-	long, err := s.service.GetLong(user, id)
+	user = strconv.Itoa(id)
+	long, err := s.service.GetLong(user, idOfParam)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
@@ -93,12 +100,15 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 		return
 	}
 	var user string
+	var id int
 	token, err := c.Request.Cookie("token")
 	if err == nil {
-		user = token.Value
+		id = s.service.SaveAndGetSessionMap(token.Value)
 	} else {
-		user = s.SetTokenAndGetIfExist(c)
+		newToken := s.SetSession(c)
+		id = s.service.SaveAndGetSessionMap(newToken)
 	}
+	user = strconv.Itoa(id)
 	short, err := s.service.GetShort(user, js.URI)
 	fmt.Println(short)
 	if err != nil {
@@ -148,12 +158,15 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		return
 	}
 	var user string
+	var id int
 	token, err := c.Request.Cookie("token")
 	if err == nil {
-		user = token.Value
+		id = s.service.SaveAndGetSessionMap(token.Value)
 	} else {
-		user = s.SetTokenAndGetIfExist(c)
+		newToken := s.SetSession(c)
+		id = s.service.SaveAndGetSessionMap(newToken)
 	}
+	user = strconv.Itoa(id)
 	for _, i := range input {
 		short, err := s.service.SaveWithoutGenerate(user, i.ID, i.Origin)
 		if err != nil && errors.Is(err, storage.ErrAlreadyExists) {
@@ -197,11 +210,11 @@ func (s *Handler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusCreated, res)
 }
 
-func (s *Handler) SetTokenAndGetIfExist(c *gin.Context) string {
-	newToken := uuid.New().String()
+func (s *Handler) SetSession(c *gin.Context) string {
+	uuid := service.GenerateUUID()
 	cookie := &http.Cookie{
 		Name:  "token",
-		Value: newToken,
+		Value: uuid,
 		Path:  "/",
 	}
 	http.SetCookie(c.Writer, cookie)

@@ -9,4 +9,5 @@ type UseCase interface {
 	CheckConn() error
 	SaveWithoutGenerate(user string, id string, path string) (string, error)
 	GetAllUrls(user string) ([]storage.URL, error)
+	SaveAndGetSessionMap(session string) int
 }

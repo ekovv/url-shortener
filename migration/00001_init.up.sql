@@ -1,5 +1,5 @@
 CREATE TABLE urls (
-    id SERIAL PRIMARY KEY,
+    idOfParam SERIAL PRIMARY KEY,
     Original text NOT NULL,
     Short text NOT NULL,
     cookie text NOT NULL

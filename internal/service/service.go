@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	_ "github.com/lib/pq"
 	"github.com/speps/go-hashids/v2"
 	"math/rand"
@@ -15,12 +16,31 @@ import (
 type Service struct {
 	Storage storage.Storage
 	config  config.Config
+	sessMap map[string]int
+	count   int
 }
 
 func NewService(storage storage.Storage, config config.Config) Service {
 	return Service{
 		Storage: storage,
 		config:  config,
+		sessMap: make(map[string]int),
+	}
+}
+
+func GenerateUUID() string {
+	newToken := uuid.New().String()
+	return newToken
+}
+
+func (s *Service) SaveAndGetSessionMap(session string) int {
+	a, ok := s.sessMap[session]
+	s.count += 1
+	if !ok {
+		s.sessMap[session] = s.count
+		return s.count
+	} else {
+		return a
 	}
 }
 

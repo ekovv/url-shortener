@@ -92,6 +92,20 @@ func (_m *UseCase) GetShort(user string, path string) (string, error) {
 	return r0, r1
 }
 
+// SaveAndGetSessionMap provides a mock function with given fields: session
+func (_m *UseCase) SaveAndGetSessionMap(session string) int {
+	ret := _m.Called(session)
+
+	var r0 int
+	if rf, ok := ret.Get(0).(func(string) int); ok {
+		r0 = rf(session)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	return r0
+}
+
 // SaveWithoutGenerate provides a mock function with given fields: user, id, path
 func (_m *UseCase) SaveWithoutGenerate(user string, id string, path string) (string, error) {
 	ret := _m.Called(user, id, path)
