@@ -153,12 +153,12 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		user = token.Value
 	} else {
 		user = s.SetTokenAndGetIfExist(c)
-		c.Status(http.StatusUnauthorized)
 	}
 	for _, i := range input {
 		short, err := s.service.SaveWithoutGenerate(user, i.ID, i.Origin)
 		if err != nil && errors.Is(err, storage.ErrAlreadyExists) {
 			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
 		}
 		i.Short = short
 		i.Origin = ""
@@ -177,7 +177,8 @@ func (s *Handler) GetAll(c *gin.Context) {
 	if err == nil {
 		user = token.Value
 	} else {
-		user = s.SetTokenAndGetIfExist(c)
+		c.Status(http.StatusUnauthorized)
+		return
 	}
 	urlsFrom, err := s.service.GetAllUrls(user)
 	if err != nil {
