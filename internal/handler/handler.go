@@ -84,6 +84,7 @@ func (s *Handler) GetLongURL(c *gin.Context) {
 	user = strconv.Itoa(id)
 	long, err := s.service.GetLong(user, idOfParam)
 	if err != nil {
+		fmt.Println("Error getting")
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
@@ -195,7 +196,6 @@ func (s *Handler) GetAll(c *gin.Context) {
 	urlsFrom, err := s.service.GetAllUrls(user)
 	if err != nil {
 		c.Status(http.StatusNoContent)
-		fmt.Errorf("error getting")
 		return
 	}
 	var res []jBatch
