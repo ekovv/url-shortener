@@ -89,7 +89,6 @@ func (s *Handler) GetLongURL(c *gin.Context) {
 	}
 	c.Status(http.StatusTemporaryRedirect)
 	c.Header("Location", long)
-
 }
 
 func (s *Handler) GetShortByJSON(c *gin.Context) {
