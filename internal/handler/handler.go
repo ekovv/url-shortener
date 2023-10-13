@@ -158,9 +158,9 @@ func (s *Handler) GetBatch(c *gin.Context) {
 	}
 	var user string
 	var id int
-	token, err := c.Request.Cookie("token")
+	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.service.SaveAndGetSessionMap(token.Value)
+		id = s.service.SaveAndGetSessionMap(token)
 	} else {
 		newToken := s.SetSession(c)
 		id = s.service.SaveAndGetSessionMap(newToken)
@@ -211,11 +211,6 @@ func (s *Handler) GetAll(c *gin.Context) {
 
 func (s *Handler) SetSession(c *gin.Context) string {
 	uuid := service.GenerateUUID()
-	cookie := &http.Cookie{
-		Name:  "token",
-		Value: uuid,
-		Path:  "/",
-	}
-	http.SetCookie(c.Writer, cookie)
-	return cookie.Value
+	c.SetCookie("token", uuid, 3600, "/", "localhost", false, true)
+	return uuid
 }
