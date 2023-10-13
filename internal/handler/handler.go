@@ -49,9 +49,9 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 	}
 	var user string
 	var id int
-	token, err := c.Request.Cookie("token")
+	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.service.SaveAndGetSessionMap(token.Value)
+		id = s.service.SaveAndGetSessionMap(token)
 	} else {
 		newToken := s.SetSession(c)
 		id = s.service.SaveAndGetSessionMap(newToken)
@@ -74,9 +74,9 @@ func (s *Handler) GetLongURL(c *gin.Context) {
 	idOfParam := c.Param("id")
 	var user string
 	var id int
-	token, err := c.Request.Cookie("token")
+	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.service.SaveAndGetSessionMap(token.Value)
+		id = s.service.SaveAndGetSessionMap(token)
 	} else {
 		newToken := s.SetSession(c)
 		id = s.service.SaveAndGetSessionMap(newToken)
@@ -100,9 +100,9 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 	}
 	var user string
 	var id int
-	token, err := c.Request.Cookie("token")
+	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.service.SaveAndGetSessionMap(token.Value)
+		id = s.service.SaveAndGetSessionMap(token)
 	} else {
 		newToken := s.SetSession(c)
 		id = s.service.SaveAndGetSessionMap(newToken)
