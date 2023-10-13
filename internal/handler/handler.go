@@ -211,6 +211,6 @@ func (s *Handler) GetAll(c *gin.Context) {
 
 func (s *Handler) SetSession(c *gin.Context) string {
 	uuid := service.GenerateUUID()
-	c.SetCookie("token", uuid, 3600, "/", "localhost", false, true)
+	c.SetCookie("token", uuid, 3600, "", "localhost", false, true)
 	return uuid
 }
