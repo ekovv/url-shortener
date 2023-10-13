@@ -77,10 +77,11 @@ func (s *Handler) GetLongURL(c *gin.Context) {
 	token, err := c.Cookie("token")
 	if err == nil {
 		id = s.service.SaveAndGetSessionMap(token)
-	} else {
-		newToken := s.SetSession(c)
-		id = s.service.SaveAndGetSessionMap(newToken)
 	}
+	//else {
+	//	newToken := s.SetSession(c)
+	//	id = s.service.SaveAndGetSessionMap(newToken)
+	//}
 	user = strconv.Itoa(id)
 	long, err := s.service.GetLong(user, idOfParam)
 	if err != nil {
