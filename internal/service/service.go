@@ -93,7 +93,7 @@ func (s *Service) SaveWithoutGenerate(user string, id string, path string) (stri
 
 func (s *Service) getShortURL() string {
 	hd := hashids.NewData()
-	hd.MinLength = 30
+	hd.MinLength = 1
 	h, _ := hashids.NewWithData(hd)
 	generator := rand.New(rand.NewSource(time.Now().UnixNano()))
 	var list []int
