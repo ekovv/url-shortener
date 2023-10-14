@@ -55,6 +55,9 @@ func (s *MapStorage) GetLong(_ string, urlShort string) (string, error) {
 func (s *MapStorage) GetAll(user string) ([]URL, error) {
 	var result []URL
 	for key, value := range s.m {
+		if user != value.User {
+			continue
+		}
 		url := URL{}
 		url.Original = value.Original
 		url.Short = key
