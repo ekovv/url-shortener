@@ -69,9 +69,9 @@ func (s *DBStorage) GetShortIfHave(_ string, path string) (string, error) {
 }
 
 func (s *DBStorage) GetLong(user string, short string) (string, error) {
-	query := "SELECT original FROM urls WHERE short = $1 AND cookie = $2"
+	query := "SELECT original FROM urls WHERE short = $1"
 	var original string
-	err := s.conn.QueryRow(query, short, user).Scan(&original)
+	err := s.conn.QueryRow(query, short).Scan(&original)
 	if err != nil {
 		return "", fmt.Errorf("error: %w", err)
 	}
