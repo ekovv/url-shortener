@@ -209,7 +209,7 @@ func (s *Handler) GetAll(c *gin.Context) {
 	for _, i := range urlsFrom {
 		batch := jBatch{}
 		batch.Origin = i.Original
-		batch.Short = i.Short
+		batch.Short = s.config.BaseURL + i.Short
 		res = append(res, batch)
 	}
 	c.Header("Content-Type", "application/json")
