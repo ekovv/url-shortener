@@ -206,7 +206,7 @@ func (s *Handler) GetAll(c *gin.Context) {
 		res = append(res, batch)
 	}
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusCreated, res)
+	c.JSON(http.StatusOK, res)
 }
 
 func (s *Handler) SetSession(c *gin.Context) string {
