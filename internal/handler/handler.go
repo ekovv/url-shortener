@@ -195,6 +195,11 @@ func (s *Handler) GetAll(c *gin.Context) {
 	}
 	urlsFrom, err := s.service.GetAllUrls(user)
 	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		fmt.Println("Error")
+		return
+	}
+	if len(urlsFrom) == 0 {
 		c.Status(http.StatusNoContent)
 		return
 	}
