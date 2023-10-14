@@ -119,7 +119,7 @@ func (s *FileStorage) GetLong(user string, short string) (string, error) {
 			_ = fmt.Errorf("error opening file storage %w", err)
 			continue
 		}
-		if f.Short == short && f.Cook == user {
+		if f.Short == short {
 			return f.Long, nil
 		}
 	}
