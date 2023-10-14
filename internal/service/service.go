@@ -35,8 +35,8 @@ func GenerateUUID() string {
 
 func (s *Service) SaveAndGetSessionMap(session string) int {
 	a, ok := s.sessMap[session]
-	s.count += 1
 	if !ok {
+		s.count += 1
 		s.sessMap[session] = s.count
 		return s.count
 	} else {
