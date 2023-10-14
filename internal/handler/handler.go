@@ -7,7 +7,6 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strconv"
 	"url-shortener/config"
 	"url-shortener/internal/domains"
 	myLog "url-shortener/internal/logger"
@@ -47,7 +46,6 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 		return
 
 	}
-	var user string
 	var id int
 	token, err := c.Cookie("token")
 	if err == nil {
@@ -56,9 +54,8 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 		newToken := s.SetSession(c)
 		id = s.service.SaveAndGetSessionMap(newToken)
 	}
-	user = strconv.Itoa(id)
 	str := string(body)
-	short, err := s.service.GetShort(user, str)
+	short, err := s.service.GetShort(id, str)
 	if err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
 			c.String(http.StatusConflict, short)
@@ -72,7 +69,6 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 
 func (s *Handler) GetLongURL(c *gin.Context) {
 	idOfParam := c.Param("id")
-	var user string
 	var id int
 	token, err := c.Cookie("token")
 	if err == nil {
@@ -81,8 +77,7 @@ func (s *Handler) GetLongURL(c *gin.Context) {
 		newToken := s.SetSession(c)
 		id = s.service.SaveAndGetSessionMap(newToken)
 	}
-	user = strconv.Itoa(id)
-	long, err := s.service.GetLong(user, idOfParam)
+	long, err := s.service.GetLong(id, idOfParam)
 	if err != nil {
 		fmt.Println("Error getting")
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
@@ -99,7 +94,6 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	var user string
 	var id int
 	token, err := c.Cookie("token")
 	if err == nil {
@@ -108,8 +102,7 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 		newToken := s.SetSession(c)
 		id = s.service.SaveAndGetSessionMap(newToken)
 	}
-	user = strconv.Itoa(id)
-	short, err := s.service.GetShort(user, js.URI)
+	short, err := s.service.GetShort(id, js.URI)
 	fmt.Println(short)
 	if err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
@@ -157,7 +150,6 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	var user string
 	var id int
 	token, err := c.Cookie("token")
 	if err == nil {
@@ -166,9 +158,8 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		newToken := s.SetSession(c)
 		id = s.service.SaveAndGetSessionMap(newToken)
 	}
-	user = strconv.Itoa(id)
 	for _, i := range input {
-		short, err := s.service.SaveWithoutGenerate(user, i.ID, i.Origin)
+		short, err := s.service.SaveWithoutGenerate(id, i.ID, i.Origin)
 		if err != nil && errors.Is(err, storage.ErrAlreadyExists) {
 			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return
@@ -185,7 +176,6 @@ func (s *Handler) GetBatch(c *gin.Context) {
 }
 
 func (s *Handler) GetAll(c *gin.Context) {
-	var user string
 	var id int
 	token, err := c.Cookie("token")
 	if err == nil {
@@ -194,8 +184,7 @@ func (s *Handler) GetAll(c *gin.Context) {
 		c.Status(http.StatusUnauthorized)
 		return
 	}
-	user = strconv.Itoa(id)
-	urlsFrom, err := s.service.GetAllUrls(user)
+	urlsFrom, err := s.service.GetAllUrls(id)
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		fmt.Println("Error")

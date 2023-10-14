@@ -43,7 +43,7 @@ func NewDBStorage(config config.Config) (*DBStorage, error) {
 
 var ErrAlreadyExists = errors.New("already have")
 
-func (s *DBStorage) Save(user string, shortURL string, path string) error {
+func (s *DBStorage) Save(user int, shortURL string, path string) error {
 	insertQuery := `INSERT INTO urls(original, short, cookie) VALUES ($1, $2, $3)`
 	_, err := s.conn.Exec(insertQuery, path, shortURL, user)
 	if err != nil {
@@ -58,7 +58,7 @@ func (s *DBStorage) Save(user string, shortURL string, path string) error {
 	return nil
 }
 
-func (s *DBStorage) GetShortIfHave(user string, path string) (string, error) {
+func (s *DBStorage) GetShortIfHave(user int, path string) (string, error) {
 	query := "SELECT short FROM urls WHERE original = $1 AND cookie = $2"
 	var short string
 	err := s.conn.QueryRow(query, path, user).Scan(&short)
@@ -68,7 +68,7 @@ func (s *DBStorage) GetShortIfHave(user string, path string) (string, error) {
 	return short, nil
 }
 
-func (s *DBStorage) GetLong(user string, short string) (string, error) {
+func (s *DBStorage) GetLong(user int, short string) (string, error) {
 	query := "SELECT original FROM urls WHERE short = $1"
 	var original string
 	err := s.conn.QueryRow(query, short).Scan(&original)
@@ -89,7 +89,7 @@ func (s *DBStorage) CheckConnection() error {
 	return nil
 }
 
-func (s *DBStorage) GetAll(user string) ([]URL, error) {
+func (s *DBStorage) GetAll(user int) ([]URL, error) {
 	query := "SELECT original, short FROM urls WHERE cookie = $1"
 	var list []URL
 	rows, err := s.conn.Query(query, user)

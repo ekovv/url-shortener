@@ -44,7 +44,7 @@ func (s *Service) SaveAndGetSessionMap(session string) int {
 	}
 }
 
-func (s *Service) GetShort(user string, path string) (string, error) {
+func (s *Service) GetShort(user int, path string) (string, error) {
 	short := s.getShortURL()
 	err := s.Storage.Save(user, short, path)
 	if err != nil {
@@ -60,7 +60,7 @@ func (s *Service) GetShort(user string, path string) (string, error) {
 	return s.config.BaseURL + short, nil
 }
 
-func (s *Service) GetLong(user string, shortURL string) (string, error) {
+func (s *Service) GetLong(user int, shortURL string) (string, error) {
 	long, err := s.Storage.GetLong(user, shortURL)
 	if err != nil {
 		return "", errors.New("invalid")
@@ -76,7 +76,7 @@ func (s *Service) CheckConn() error {
 	return nil
 }
 
-func (s *Service) SaveWithoutGenerate(user string, id string, path string) (string, error) {
+func (s *Service) SaveWithoutGenerate(user int, id string, path string) (string, error) {
 	err := s.Storage.Save(user, id, path)
 	if err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
@@ -113,7 +113,7 @@ func (s *Service) getShortURL() string {
 	return e
 }
 
-func (s *Service) GetAllUrls(user string) ([]storage.URL, error) {
+func (s *Service) GetAllUrls(user int) ([]storage.URL, error) {
 	list, err := s.Storage.GetAll(user)
 	if err != nil {
 		return nil, fmt.Errorf("error getting %w", err)

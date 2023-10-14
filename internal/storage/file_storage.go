@@ -48,7 +48,7 @@ func (s *FileStorage) Close() error {
 	return s.File.Close()
 }
 
-func (s *FileStorage) Save(user string, short string, long string) error {
+func (s *FileStorage) Save(user int, short string, long string) error {
 
 	var f = inFile{
 		UUID:  strconv.Itoa(s.count),
@@ -70,7 +70,7 @@ func (s *FileStorage) Save(user string, short string, long string) error {
 	return nil
 }
 
-func (s *FileStorage) GetShortIfHave(user string, path string) (string, error) {
+func (s *FileStorage) GetShortIfHave(user int, path string) (string, error) {
 	err := s.Open()
 	if err != nil {
 		return "", fmt.Errorf("error opening file storage %w", err)
@@ -100,10 +100,10 @@ type inFile struct {
 	UUID  string `json:"uuid"`
 	Short string `json:"short_url"`
 	Long  string `json:"original_url"`
-	Cook  string `json:"cook"`
+	Cook  int    `json:"cook"`
 }
 
-func (s *FileStorage) GetLong(user string, short string) (string, error) {
+func (s *FileStorage) GetLong(user int, short string) (string, error) {
 	err := s.Open()
 	if err != nil {
 		return "", fmt.Errorf("error opening file storage %w", err)
@@ -130,7 +130,7 @@ func (s *FileStorage) GetLong(user string, short string) (string, error) {
 	return "", nil
 }
 
-func (s *FileStorage) GetAll(user string) ([]URL, error) {
+func (s *FileStorage) GetAll(user int) ([]URL, error) {
 	err := s.Open()
 	if err != nil {
 		return nil, fmt.Errorf("error opening file storage %w", err)

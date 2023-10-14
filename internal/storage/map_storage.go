@@ -28,22 +28,22 @@ func NewMapStorage() *MapStorage {
 
 }
 
-func (s *MapStorage) Save(user string, shortURL string, path string) error {
+func (s *MapStorage) Save(user int, shortURL string, path string) error {
 	ur := URLInfo{Original: path, User: user}
 	s.m[shortURL] = ur
 	return nil
 }
 
-func (s *MapStorage) GetShortIfHave(user string, path string) (string, error) {
+func (s *MapStorage) GetShortIfHave(user int, path string) (string, error) {
 	for key, value := range s.m {
-		if value.Original == path {
+		if value.Original == path && value.User == user {
 			return key, nil
 		}
 	}
 	return "", fmt.Errorf("Not found")
 }
 
-func (s *MapStorage) GetLong(_ string, urlShort string) (string, error) {
+func (s *MapStorage) GetLong(_ int, urlShort string) (string, error) {
 	ur, ok := s.m[urlShort]
 	if !ok {
 		return "", errors.New("long url not found")
@@ -52,7 +52,7 @@ func (s *MapStorage) GetLong(_ string, urlShort string) (string, error) {
 	return ur.Original, nil
 }
 
-func (s *MapStorage) GetAll(user string) ([]URL, error) {
+func (s *MapStorage) GetAll(user int) ([]URL, error) {
 	var result []URL
 	for key, value := range s.m {
 		if user != value.User {

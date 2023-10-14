@@ -7,5 +7,5 @@ type URL struct {
 
 type URLInfo struct {
 	Original string
-	User     string
+	User     int
 }
