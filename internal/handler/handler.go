@@ -186,13 +186,15 @@ func (s *Handler) GetBatch(c *gin.Context) {
 
 func (s *Handler) GetAll(c *gin.Context) {
 	var user string
-	token, err := c.Request.Cookie("token")
+	var id int
+	token, err := c.Cookie("token")
 	if err == nil {
-		user = token.Value
+		id = s.service.SaveAndGetSessionMap(token)
 	} else {
 		c.Status(http.StatusUnauthorized)
 		return
 	}
+	user = strconv.Itoa(id)
 	urlsFrom, err := s.service.GetAllUrls(user)
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
