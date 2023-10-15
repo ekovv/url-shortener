@@ -181,7 +181,7 @@ func (s *Handler) GetAll(c *gin.Context) {
 	if err == nil {
 		id = s.service.SaveAndGetSessionMap(token)
 	} else {
-		c.Status(http.StatusUnauthorized)
+		c.Status(http.StatusNoContent)
 		return
 	}
 	urlsFrom, err := s.service.GetAllUrls(id)
