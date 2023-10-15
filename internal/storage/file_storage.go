@@ -15,11 +15,6 @@ type FileStorage struct {
 }
 
 func (s *FileStorage) GetLastID() (int, error) {
-	err := s.Open()
-	if err != nil {
-		return 0, fmt.Errorf("error opening file storage %w", err)
-	}
-	defer s.File.Close()
 	scanner := bufio.NewScanner(s.File)
 
 	count := 0
