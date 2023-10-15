@@ -112,7 +112,7 @@ func (s *DBStorage) GetAll(user int) ([]URL, error) {
 	}
 	defer func() {
 		_ = rows.Close()
-		_ = rows.Err() // or modify return value
+		_ = rows.Err()
 	}()
 	for rows.Next() {
 		url := URL{}
