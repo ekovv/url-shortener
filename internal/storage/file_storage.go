@@ -14,6 +14,17 @@ type FileStorage struct {
 	count int
 }
 
+func (s *FileStorage) GetLastID() (int, error) {
+	scanner := bufio.NewScanner(s.File)
+
+	count := 0
+	for scanner.Scan() {
+		count++
+	}
+
+	return count, nil
+}
+
 func (s *FileStorage) CheckConnection() error {
 	if s.File == nil {
 		return fmt.Errorf("file not open")
@@ -48,12 +59,13 @@ func (s *FileStorage) Close() error {
 	return s.File.Close()
 }
 
-func (s *FileStorage) Save(short string, long string) error {
+func (s *FileStorage) Save(user int, short string, long string) error {
 
 	var f = inFile{
 		UUID:  strconv.Itoa(s.count),
 		Short: short,
 		Long:  long,
+		Cook:  user,
 	}
 	s.count += 1
 	jsonData, err := json.Marshal(f)
@@ -69,7 +81,7 @@ func (s *FileStorage) Save(short string, long string) error {
 	return nil
 }
 
-func (s *FileStorage) GetShortIfHave(path string) (string, error) {
+func (s *FileStorage) GetShortIfHave(user int, path string) (string, error) {
 	err := s.Open()
 	if err != nil {
 		return "", fmt.Errorf("error opening file storage %w", err)
@@ -84,7 +96,7 @@ func (s *FileStorage) GetShortIfHave(path string) (string, error) {
 			_ = fmt.Errorf("error opening file storage %w", err)
 			continue
 		}
-		if f.Long == path {
+		if f.Long == path && f.Cook == user {
 			return f.Short, nil
 		}
 	}
@@ -99,9 +111,10 @@ type inFile struct {
 	UUID  string `json:"uuid"`
 	Short string `json:"short_url"`
 	Long  string `json:"original_url"`
+	Cook  int    `json:"cook"`
 }
 
-func (s *FileStorage) GetLong(short string) (string, error) {
+func (s *FileStorage) GetLong(user int, short string) (string, error) {
 	err := s.Open()
 	if err != nil {
 		return "", fmt.Errorf("error opening file storage %w", err)
@@ -126,4 +139,34 @@ func (s *FileStorage) GetLong(short string) (string, error) {
 		return "", fmt.Errorf("error opening file storage %w", err)
 	}
 	return "", nil
+}
+
+func (s *FileStorage) GetAll(user int) ([]URL, error) {
+	err := s.Open()
+	if err != nil {
+		return nil, fmt.Errorf("error opening file storage %w", err)
+	}
+	defer s.File.Close()
+	var list []URL
+	scanner := bufio.NewScanner(s.File)
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		var f inFile
+		err := json.Unmarshal(line, &f)
+		if err != nil {
+			_ = fmt.Errorf("error opening file storage %w", err)
+			continue
+		}
+		url := URL{}
+		if f.Cook == user {
+			url.Original = f.Long
+			url.Short = f.Short
+			list = append(list, url)
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("error opening file storage %w", err)
+	}
+	return list, nil
 }

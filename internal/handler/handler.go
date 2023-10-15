@@ -10,6 +10,7 @@ import (
 	"url-shortener/config"
 	"url-shortener/internal/domains"
 	myLog "url-shortener/internal/logger"
+	"url-shortener/internal/service"
 	"url-shortener/internal/storage"
 )
 
@@ -45,8 +46,16 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 		return
 
 	}
+	var id int
+	token, err := c.Cookie("token")
+	if err == nil {
+		id = s.service.SaveAndGetSessionMap(token)
+	} else {
+		newToken := s.SetSession(c)
+		id = s.service.SaveAndGetSessionMap(newToken)
+	}
 	str := string(body)
-	short, err := s.service.GetShort(str)
+	short, err := s.service.GetShort(id, str)
 	if err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
 			c.String(http.StatusConflict, short)
@@ -59,15 +68,23 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 }
 
 func (s *Handler) GetLongURL(c *gin.Context) {
-	id := c.Param("id")
-	long, err := s.service.GetLong(id)
+	idOfParam := c.Param("id")
+	var id int
+	token, err := c.Cookie("token")
+	if err == nil {
+		id = s.service.SaveAndGetSessionMap(token)
+	} else {
+		newToken := s.SetSession(c)
+		id = s.service.SaveAndGetSessionMap(newToken)
+	}
+	long, err := s.service.GetLong(id, idOfParam)
 	if err != nil {
+		fmt.Println("Error getting")
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
 	c.Status(http.StatusTemporaryRedirect)
 	c.Header("Location", long)
-
 }
 
 func (s *Handler) GetShortByJSON(c *gin.Context) {
@@ -77,7 +94,15 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	short, err := s.service.GetShort(js.URI)
+	var id int
+	token, err := c.Cookie("token")
+	if err == nil {
+		id = s.service.SaveAndGetSessionMap(token)
+	} else {
+		newToken := s.SetSession(c)
+		id = s.service.SaveAndGetSessionMap(newToken)
+	}
+	short, err := s.service.GetShort(id, js.URI)
 	fmt.Println(short)
 	if err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
@@ -125,17 +150,63 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
+	var id int
+	token, err := c.Cookie("token")
+	if err == nil {
+		id = s.service.SaveAndGetSessionMap(token)
+	} else {
+		newToken := s.SetSession(c)
+		id = s.service.SaveAndGetSessionMap(newToken)
+	}
 	for _, i := range input {
-		short, err := s.service.SaveWithoutGenerate(i.ID, i.Origin)
+		short, err := s.service.SaveWithoutGenerate(id, i.ID, i.Origin)
 		if err != nil && errors.Is(err, storage.ErrAlreadyExists) {
 			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
 		}
 		i.Short = short
 		i.Origin = ""
 		res = append(res, i)
+
 	}
 	//res = append(res, string(bytes))
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusCreated, res)
 
+}
+
+func (s *Handler) GetAll(c *gin.Context) {
+	var id int
+	token, err := c.Cookie("token")
+	if err == nil {
+		id = s.service.SaveAndGetSessionMap(token)
+	} else {
+		c.Status(http.StatusNoContent)
+		return
+	}
+	urlsFrom, err := s.service.GetAllUrls(id)
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		fmt.Println("Error")
+		return
+	}
+	if len(urlsFrom) == 0 {
+		c.Status(http.StatusNoContent)
+		return
+	}
+	var res []jBatch
+	for _, i := range urlsFrom {
+		batch := jBatch{}
+		batch.Origin = i.Original
+		batch.Short = s.config.BaseURL + i.Short
+		res = append(res, batch)
+	}
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, res)
+}
+
+func (s *Handler) SetSession(c *gin.Context) string {
+	uuid := service.GenerateUUID()
+	c.SetCookie("token", uuid, 3600, "", "localhost", false, true)
+	return uuid
 }

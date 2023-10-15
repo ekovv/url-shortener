@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go.uber.org/zap"
+	"log"
 	"url-shortener/config"
 	"url-shortener/internal/handler"
 	myLog "url-shortener/internal/logger"
@@ -17,9 +18,13 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	sr := service.NewService(stM, conf)
-	h := handler.NewHandler(&sr, conf)
+	sr, err := service.NewService(stM, conf)
+	if err != nil {
+		log.Fatalf("Error creating service: %s", err)
+		return
+	}
 
+	h := handler.NewHandler(&sr, conf)
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		panic(err)
