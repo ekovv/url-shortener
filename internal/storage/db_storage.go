@@ -110,12 +110,10 @@ func (s *DBStorage) GetAll(user int) ([]URL, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to getall urls: %w", err)
 	}
-	defer func(rows *sql.Rows) {
-		err := rows.Close()
-		if err != nil {
-			return
-		}
-	}(rows)
+	defer func() {
+		_ = rows.Close()
+		_ = rows.Err() // or modify return value
+	}()
 	for rows.Next() {
 		url := URL{}
 		err = rows.Scan(&url.Original, &url.Short)
