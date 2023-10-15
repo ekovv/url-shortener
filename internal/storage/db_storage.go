@@ -16,12 +16,17 @@ type DBStorage struct {
 }
 
 func (s *DBStorage) GetLastID() (int, error) {
-	var lastID int
+	var lastID sql.NullInt64
 	err := s.conn.QueryRow("SELECT MAX(id) FROM urls").Scan(&lastID)
 	if err != nil {
 		return 0, err
 	}
-	return lastID, nil
+
+	if lastID.Valid {
+		return int(lastID.Int64), nil
+	}
+
+	return 0, nil
 }
 
 func NewDBStorage(config config.Config) (*DBStorage, error) {
