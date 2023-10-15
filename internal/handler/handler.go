@@ -48,7 +48,7 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 	}
 	var id int
 	token, err := c.Cookie("token")
-	if err == nil {
+	if errors.Is(err, http.ErrNoCookie) {
 		id = s.service.SaveAndGetSessionMap(token)
 	} else {
 		newToken := s.SetSession(c)
@@ -71,7 +71,7 @@ func (s *Handler) GetLongURL(c *gin.Context) {
 	idOfParam := c.Param("id")
 	var id int
 	token, err := c.Cookie("token")
-	if err == nil {
+	if errors.Is(err, http.ErrNoCookie) {
 		id = s.service.SaveAndGetSessionMap(token)
 	} else {
 		newToken := s.SetSession(c)
@@ -96,7 +96,7 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 	}
 	var id int
 	token, err := c.Cookie("token")
-	if err == nil {
+	if errors.Is(err, http.ErrNoCookie) {
 		id = s.service.SaveAndGetSessionMap(token)
 	} else {
 		newToken := s.SetSession(c)
@@ -152,7 +152,7 @@ func (s *Handler) GetBatch(c *gin.Context) {
 	}
 	var id int
 	token, err := c.Cookie("token")
-	if err == nil {
+	if errors.Is(err, http.ErrNoCookie) {
 		id = s.service.SaveAndGetSessionMap(token)
 	} else {
 		newToken := s.SetSession(c)
@@ -178,7 +178,7 @@ func (s *Handler) GetBatch(c *gin.Context) {
 func (s *Handler) GetAll(c *gin.Context) {
 	var id int
 	token, err := c.Cookie("token")
-	if err == nil {
+	if errors.Is(err, http.ErrNoCookie) {
 		id = s.service.SaveAndGetSessionMap(token)
 	} else {
 		c.Status(http.StatusUnauthorized)
