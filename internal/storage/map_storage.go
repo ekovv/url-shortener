@@ -44,7 +44,7 @@ func (s *MapStorage) GetShortIfHave(user int, path string) (string, error) {
 			return key, nil
 		}
 	}
-	return "", fmt.Errorf("Not found")
+	return "", fmt.Errorf("not found")
 }
 
 func (s *MapStorage) GetLong(_ int, urlShort string) (string, error) {

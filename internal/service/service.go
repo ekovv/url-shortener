@@ -18,7 +18,7 @@ type Service struct {
 	Storage storage.Storage
 	config  config.Config
 	sessMap map[string]int
-	count   atomic.Uint64
+	count   *atomic.Uint64
 }
 
 func NewService(storage storage.Storage, config config.Config) (Service, error) {
@@ -27,13 +27,13 @@ func NewService(storage storage.Storage, config config.Config) (Service, error) 
 		return Service{}, fmt.Errorf("error getting last id: %w", err)
 	}
 
-	a := atomic.Uint64{}
-	a.Store(uint64(lastID))
+	newID := atomic.Uint64{}
+	newID.Store(uint64(lastID))
 	return Service{
 		Storage: storage,
 		config:  config,
 		sessMap: make(map[string]int),
-		count:   a,
+		count:   &newID,
 	}, nil
 }
 
