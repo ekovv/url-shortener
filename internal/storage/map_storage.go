@@ -9,6 +9,10 @@ type MapStorage struct {
 	m map[string]URLInfo
 }
 
+func (s *MapStorage) GetLastID() (int, error) {
+	return len(s.m), nil
+}
+
 func (s *MapStorage) CheckConnection() error {
 	if s.m == nil {
 		return errors.New("map nil")

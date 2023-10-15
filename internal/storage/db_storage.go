@@ -15,6 +15,15 @@ type DBStorage struct {
 	conn *sql.DB
 }
 
+func (s *DBStorage) GetLastID() (int, error) {
+	var lastID int
+	err := s.conn.QueryRow("SELECT MAX(id) FROM urls").Scan(&lastID)
+	if err != nil {
+		return 0, err
+	}
+	return lastID, nil
+}
+
 func NewDBStorage(config config.Config) (*DBStorage, error) {
 	db, err := sql.Open("postgres", config.DB)
 	if err != nil {

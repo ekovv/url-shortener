@@ -12,6 +12,7 @@ type Storage interface {
 	Close() error
 	CheckConnection() error
 	GetAll(user int) ([]URL, error)
+	GetLastID() (int, error)
 }
 
 func New(cfg config.Config) (Storage, error) {

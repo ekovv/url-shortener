@@ -8,6 +8,7 @@ import (
 	"github.com/speps/go-hashids/v2"
 	"math/rand"
 	"strconv"
+	"sync/atomic"
 	"time"
 	"url-shortener/config"
 	"url-shortener/internal/storage"
@@ -17,15 +18,23 @@ type Service struct {
 	Storage storage.Storage
 	config  config.Config
 	sessMap map[string]int
-	count   int
+	count   atomic.Uint64
 }
 
-func NewService(storage storage.Storage, config config.Config) Service {
+func NewService(storage storage.Storage, config config.Config) (Service, error) {
+	lastID, err := storage.GetLastID()
+	if err != nil {
+		return Service{}, fmt.Errorf("error getting last id: %w", err)
+	}
+
+	a := atomic.Uint64{}
+	a.Store(uint64(lastID))
 	return Service{
 		Storage: storage,
 		config:  config,
 		sessMap: make(map[string]int),
-	}
+		count:   a,
+	}, nil
 }
 
 func GenerateUUID() string {
@@ -36,9 +45,10 @@ func GenerateUUID() string {
 func (s *Service) SaveAndGetSessionMap(session string) int {
 	a, ok := s.sessMap[session]
 	if !ok {
-		s.count += 1
-		s.sessMap[session] = s.count
-		return s.count
+		s.count.Add(1)
+		intID := int(s.count.Load())
+		s.sessMap[session] = intID
+		return intID
 	} else {
 		return a
 	}
