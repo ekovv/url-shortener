@@ -23,7 +23,6 @@ func main() {
 		log.Fatalf("Error creating service: %s", err)
 		return
 	}
-
 	h := handler.NewHandler(&sr, conf)
 	logger, err := zap.NewDevelopment()
 	if err != nil {
