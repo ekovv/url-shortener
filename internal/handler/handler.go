@@ -225,7 +225,7 @@ func (s *Handler) Del(c *gin.Context) {
 		return
 	}
 	var inputList []string
-	err = c.Bind(inputList)
+	err = c.ShouldBindJSON(&inputList)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
