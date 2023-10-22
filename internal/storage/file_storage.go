@@ -60,12 +60,13 @@ func (s *FileStorage) Close() error {
 }
 
 func (s *FileStorage) Save(user int, short string, long string) error {
-
+	flag := false
 	var f = inFile{
 		UUID:  strconv.Itoa(s.count),
 		Short: short,
 		Long:  long,
 		Cook:  user,
+		Del:   flag,
 	}
 	s.count += 1
 	jsonData, err := json.Marshal(f)
@@ -112,6 +113,7 @@ type inFile struct {
 	Short string `json:"short_url"`
 	Long  string `json:"original_url"`
 	Cook  int    `json:"cook"`
+	Del   bool   `json:"is_deleted"`
 }
 
 func (s *FileStorage) GetLong(user int, short string) (string, error) {

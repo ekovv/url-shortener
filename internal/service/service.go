@@ -130,3 +130,11 @@ func (s *Service) GetAllUrls(user int) ([]storage.URL, error) {
 	}
 	return list, nil
 }
+
+func (s *Service) Delete(list []string, id int) error {
+	err := s.Storage.DeleteUrls(list, id)
+	if err != nil {
+		return fmt.Errorf("faile delete %w", err)
+	}
+	return nil
+}

@@ -124,3 +124,12 @@ func (s *DBStorage) GetAll(user int) ([]URL, error) {
 	}
 	return list, nil
 }
+
+func (s *DBStorage) DeleteUrls(list []string, user int) error {
+	query := "UPDATE urls SET del = true WHERE short = ANY($1) AND cookie = $2"
+	_, err := s.conn.Exec(query, list, user)
+	if err != nil {
+		return fmt.Errorf("failed to delete %w", err)
+	}
+	return nil
+}

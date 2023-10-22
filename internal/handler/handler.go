@@ -210,3 +210,28 @@ func (s *Handler) SetSession(c *gin.Context) string {
 	c.SetCookie("token", uuid, 3600, "", "localhost", false, true)
 	return uuid
 }
+
+func (s *Handler) Del(c *gin.Context) {
+	var id int
+	token, err := c.Cookie("token")
+	if err == nil {
+		id = s.service.SaveAndGetSessionMap(token)
+	} else {
+		c.Status(http.StatusNoContent)
+		return
+	}
+	var inputList []string
+	err = c.Bind(inputList)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
+	go func() {
+		err = s.service.Delete(inputList, id)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+	}()
+	c.Status(http.StatusAccepted)
+}

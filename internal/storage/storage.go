@@ -13,6 +13,7 @@ type Storage interface {
 	CheckConnection() error
 	GetAll(user int) ([]URL, error)
 	GetLastID() (int, error)
+	DeleteUrls(list []string, user int) error
 }
 
 func New(cfg config.Config) (Storage, error) {
