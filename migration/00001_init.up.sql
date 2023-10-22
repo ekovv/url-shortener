@@ -3,7 +3,7 @@ CREATE TABLE urls (
     original text NOT NULL,
     short text NOT NULL,
     cookie int NOT NULL,
-    deleteFlag bool
+    deleteFlag bool NOT NULL
 );
 ALTER TABLE urls
     ADD CONSTRAINT unique_url
