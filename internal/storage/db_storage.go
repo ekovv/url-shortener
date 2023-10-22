@@ -83,9 +83,13 @@ func (s *DBStorage) GetShortIfHave(user int, path string) (string, error) {
 }
 
 func (s *DBStorage) GetLong(user int, short string) (string, error) {
-	query := "SELECT original FROM urls WHERE short = $1"
+	query := "SELECT original, del FROM urls WHERE short = $1"
 	var original string
-	err := s.conn.QueryRow(query, short).Scan(&original)
+	var deleted bool
+	err := s.conn.QueryRow(query, short).Scan(&original, &deleted)
+	if deleted {
+		return "", nil
+	}
 	if err != nil {
 		return "", fmt.Errorf("error: %w", err)
 	}

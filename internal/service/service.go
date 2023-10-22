@@ -72,6 +72,9 @@ func (s *Service) GetShort(user int, path string) (string, error) {
 
 func (s *Service) GetLong(user int, shortURL string) (string, error) {
 	long, err := s.Storage.GetLong(user, shortURL)
+	if long == "" && err == nil {
+		return "", nil
+	}
 	if err != nil {
 		return "", errors.New("invalid")
 	}

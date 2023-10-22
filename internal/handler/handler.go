@@ -78,6 +78,10 @@ func (s *Handler) GetLongURL(c *gin.Context) {
 		id = s.service.SaveAndGetSessionMap(newToken)
 	}
 	long, err := s.service.GetLong(id, idOfParam)
+	if long == "" && err == nil {
+		c.Status(http.StatusGone)
+		return
+	}
 	if err != nil {
 		fmt.Println("Error getting")
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
