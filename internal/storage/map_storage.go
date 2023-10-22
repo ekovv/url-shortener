@@ -9,6 +9,11 @@ type MapStorage struct {
 	m map[string]URLInfo
 }
 
+func (s *MapStorage) DeleteUrls(list []string, user int) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (s *MapStorage) GetLastID() (int, error) {
 	return len(s.m), nil
 }

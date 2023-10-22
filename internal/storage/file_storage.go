@@ -14,6 +14,11 @@ type FileStorage struct {
 	count int
 }
 
+func (s *FileStorage) DeleteUrls(list []string, user int) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (s *FileStorage) GetLastID() (int, error) {
 	scanner := bufio.NewScanner(s.File)
 
