@@ -58,8 +58,8 @@ func NewDBStorage(config config.Config) (*DBStorage, error) {
 var ErrAlreadyExists = errors.New("already have")
 
 func (s *DBStorage) Save(user int, shortURL string, path string) error {
-	insertQuery := `INSERT INTO urls(original, short, cookie) VALUES ($1, $2, $3)`
-	_, err := s.conn.Exec(insertQuery, path, shortURL, user)
+	insertQuery := `INSERT INTO urls(original, short, cookie, del) VALUES ($1, $2, $3, $4)`
+	_, err := s.conn.Exec(insertQuery, path, shortURL, user, false)
 	if err != nil {
 		var e *pq.Error
 		if errors.As(err, &e) {
