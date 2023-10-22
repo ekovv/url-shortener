@@ -9,4 +9,5 @@ func Route(c *gin.Engine, h *Handler) {
 	c.GET("/ping")
 	c.POST("/api/shorten/batch", h.GetBatch)
 	c.GET("/api/user/urls", h.GetAll)
+	c.DELETE("/api/user/urls", h.Del)
 }
