@@ -1,5 +1,6 @@
 package handler
 
+//
 //import (
 //	"encoding/json"
 //	"errors"
@@ -13,20 +14,24 @@ package handler
 //)
 //
 //type serviceMock func(c *mocks.UseCase)
+//type sessionMock func(c *mocks.SessionUseCase)
 //
 //func TestHandler_UpdateAndGetShort(t *testing.T) {
 //
 //	tests := []struct {
 //		name        string
 //		body        string
+//		sessionMock sessionMock
 //		serviceMock serviceMock
 //		wantCode    int
 //	}{
 //		{
 //			name: "OK1",
 //			body: "https://ya.ru",
+//			sessionMock: func(c *mocks.SessionUseCase) {
+//				c.Mock.On("CreateIfNotExists", "ahjduokl12").Return(1)
+//			},
 //			serviceMock: func(c *mocks.UseCase) {
-//				c.Mock.On("SaveAndGetSessionMap", "aqu12iof").Return(1).Times(1)
 //				c.Mock.On("GetShort", "1", "https://ya.ru").Return("adh35Kof", nil).Times(1)
 //			},
 //			wantCode: http.StatusCreated,
@@ -34,6 +39,9 @@ package handler
 //		{
 //			name: "BAD",
 //			body: "12",
+//			sessionMock: func(c *mocks.SessionUseCase) {
+//				c.Mock.On("CreateIfNotExists", "ahjduokl12").Return(1)
+//			},
 //			serviceMock: func(c *mocks.UseCase) {
 //				c.Mock.On("GetShort", "", "12").Return("", errors.New("invalid")).Times(1)
 //			},
@@ -45,8 +53,10 @@ package handler
 //		t.Run(tt.name, func(t *testing.T) {
 //			g := gin.Default()
 //			service := mocks.NewUseCase(t)
-//			h := NewHandler(service, config.Config{})
+//			sessionMock := mocks.NewSessionUseCase(t)
+//			h := NewHandler(service, sessionMock, config.Config{})
 //			tt.serviceMock(service)
+//			tt.sessionMock(sessionMock)
 //
 //			path := "/t"
 //			g.POST(path, h.UpdateAndGetShort)
@@ -68,12 +78,16 @@ package handler
 //	tests := []struct {
 //		name        string
 //		shortURL    string
+//		sessionMock sessionMock
 //		serviceMock serviceMock
 //		wantCode    int
 //	}{
 //		{
 //			name:     "OK1",
 //			shortURL: "fs23oyrh",
+//			sessionMock: func(c *mocks.SessionUseCase) {
+//				c.Mock.On("CreateIfNotExists", "ahjduokl12").Return(1)
+//			},
 //			serviceMock: func(c *mocks.UseCase) {
 //				c.Mock.On("GetLong", "fs23oyrh").Return("https://ya.ru", nil).Times(1)
 //			},
@@ -91,7 +105,8 @@ package handler
 //	g := gin.Default()
 //
 //	service := mocks.NewUseCase(t)
-//	h := NewHandler(service, config.Config{})
+//	sessionMock := mocks.NewSessionUseCase(t)
+//	h := NewHandler(service, sessionMock, config.Config{})
 //
 //	path := "/:id"
 //	g.GET(path, h.GetLongURL)
@@ -120,6 +135,7 @@ package handler
 //	tests := []struct {
 //		name        string
 //		json        jso
+//		sessionMock sessionMock
 //		serviceMock serviceMock
 //		wantCode    int
 //	}{
@@ -150,7 +166,8 @@ package handler
 //			g := gin.Default()
 //
 //			service := mocks.NewUseCase(t)
-//			h := NewHandler(service, config.Config{})
+//			sessionMock := mocks.NewSessionUseCase(t)
+//			h := NewHandler(service, sessionMock, config.Config{})
 //
 //			path := "/api/shorten"
 //			g.POST(path, h.GetShortByJSON)

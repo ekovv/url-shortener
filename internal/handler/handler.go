@@ -15,17 +15,19 @@ import (
 )
 
 type Handler struct {
-	service domains.UseCase
-	engine  *gin.Engine
-	config  config.Config
+	service        domains.UseCase
+	sessionService domains.SessionUseCase
+	engine         *gin.Engine
+	config         config.Config
 }
 
-func NewHandler(service domains.UseCase, conf config.Config) *Handler {
+func NewHandler(service domains.UseCase, sessionService domains.SessionUseCase, conf config.Config) *Handler {
 	router := gin.Default()
 	h := &Handler{
-		service: service,
-		config:  conf,
-		engine:  router,
+		service:        service,
+		sessionService: sessionService,
+		config:         conf,
+		engine:         router,
 	}
 	router.Use(h.AcceptEncoding())
 	router.Use(h.Decompressed())
@@ -49,10 +51,10 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 	var id int
 	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.service.SaveAndGetSessionMap(token)
+		id = s.sessionService.CreateIfNotExists(token)
 	} else {
 		newToken := s.SetSession(c)
-		id = s.service.SaveAndGetSessionMap(newToken)
+		id = s.sessionService.CreateIfNotExists(newToken)
 	}
 	str := string(body)
 	short, err := s.service.GetShort(id, str)
@@ -72,10 +74,10 @@ func (s *Handler) GetLongURL(c *gin.Context) {
 	var id int
 	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.service.SaveAndGetSessionMap(token)
+		id = s.sessionService.CreateIfNotExists(token)
 	} else {
 		newToken := s.SetSession(c)
-		id = s.service.SaveAndGetSessionMap(newToken)
+		id = s.sessionService.CreateIfNotExists(newToken)
 	}
 	long, err := s.service.GetLong(id, idOfParam)
 	if long == "" && err == nil {
@@ -101,10 +103,10 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 	var id int
 	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.service.SaveAndGetSessionMap(token)
+		id = s.sessionService.CreateIfNotExists(token)
 	} else {
 		newToken := s.SetSession(c)
-		id = s.service.SaveAndGetSessionMap(newToken)
+		id = s.sessionService.CreateIfNotExists(newToken)
 	}
 	short, err := s.service.GetShort(id, js.URI)
 	fmt.Println(short)
@@ -157,10 +159,10 @@ func (s *Handler) GetBatch(c *gin.Context) {
 	var id int
 	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.service.SaveAndGetSessionMap(token)
+		id = s.sessionService.CreateIfNotExists(token)
 	} else {
 		newToken := s.SetSession(c)
-		id = s.service.SaveAndGetSessionMap(newToken)
+		id = s.sessionService.CreateIfNotExists(newToken)
 	}
 	for _, i := range input {
 		short, err := s.service.SaveWithoutGenerate(id, i.ID, i.Origin)
@@ -183,7 +185,7 @@ func (s *Handler) GetAll(c *gin.Context) {
 	var id int
 	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.service.SaveAndGetSessionMap(token)
+		id = s.sessionService.CreateIfNotExists(token)
 	} else {
 		c.Status(http.StatusNoContent)
 		return
@@ -219,7 +221,7 @@ func (s *Handler) Del(c *gin.Context) {
 	var id int
 	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.service.SaveAndGetSessionMap(token)
+		id = s.sessionService.CreateIfNotExists(token)
 	} else {
 		c.Status(http.StatusNoContent)
 		return

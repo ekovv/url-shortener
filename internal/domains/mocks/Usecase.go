@@ -27,12 +27,26 @@ func (_m *UseCase) CheckConn() error {
 	return r0
 }
 
+// Delete provides a mock function with given fields: list, id
+func (_m *UseCase) Delete(list []string, id int) error {
+	ret := _m.Called(list, id)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func([]string, int) error); ok {
+		r0 = rf(list, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // GetAllUrls provides a mock function with given fields: user
-func (_m *UseCase) GetAllUrls(user string) ([]storage.URL, error) {
+func (_m *UseCase) GetAllUrls(user int) ([]storage.URL, error) {
 	ret := _m.Called(user)
 
 	var r0 []storage.URL
-	if rf, ok := ret.Get(0).(func(string) []storage.URL); ok {
+	if rf, ok := ret.Get(0).(func(int) []storage.URL); ok {
 		r0 = rf(user)
 	} else {
 		if ret.Get(0) != nil {
@@ -41,7 +55,7 @@ func (_m *UseCase) GetAllUrls(user string) ([]storage.URL, error) {
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
+	if rf, ok := ret.Get(1).(func(int) error); ok {
 		r1 = rf(user)
 	} else {
 		r1 = ret.Error(1)
@@ -51,18 +65,18 @@ func (_m *UseCase) GetAllUrls(user string) ([]storage.URL, error) {
 }
 
 // GetLong provides a mock function with given fields: user, shortURL
-func (_m *UseCase) GetLong(user string, shortURL string) (string, error) {
+func (_m *UseCase) GetLong(user int, shortURL string) (string, error) {
 	ret := _m.Called(user, shortURL)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(string, string) string); ok {
+	if rf, ok := ret.Get(0).(func(int, string) string); ok {
 		r0 = rf(user, shortURL)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+	if rf, ok := ret.Get(1).(func(int, string) error); ok {
 		r1 = rf(user, shortURL)
 	} else {
 		r1 = ret.Error(1)
@@ -72,18 +86,18 @@ func (_m *UseCase) GetLong(user string, shortURL string) (string, error) {
 }
 
 // GetShort provides a mock function with given fields: user, path
-func (_m *UseCase) GetShort(user string, path string) (string, error) {
+func (_m *UseCase) GetShort(user int, path string) (string, error) {
 	ret := _m.Called(user, path)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(string, string) string); ok {
+	if rf, ok := ret.Get(0).(func(int, string) string); ok {
 		r0 = rf(user, path)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+	if rf, ok := ret.Get(1).(func(int, string) error); ok {
 		r1 = rf(user, path)
 	} else {
 		r1 = ret.Error(1)
@@ -92,33 +106,19 @@ func (_m *UseCase) GetShort(user string, path string) (string, error) {
 	return r0, r1
 }
 
-// SaveAndGetSessionMap provides a mock function with given fields: session
-func (_m *UseCase) SaveAndGetSessionMap(session string) int {
-	ret := _m.Called(session)
-
-	var r0 int
-	if rf, ok := ret.Get(0).(func(string) int); ok {
-		r0 = rf(session)
-	} else {
-		r0 = ret.Get(0).(int)
-	}
-
-	return r0
-}
-
 // SaveWithoutGenerate provides a mock function with given fields: user, id, path
-func (_m *UseCase) SaveWithoutGenerate(user string, id string, path string) (string, error) {
+func (_m *UseCase) SaveWithoutGenerate(user int, id string, path string) (string, error) {
 	ret := _m.Called(user, id, path)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(string, string, string) string); ok {
+	if rf, ok := ret.Get(0).(func(int, string, string) string); ok {
 		r0 = rf(user, id, path)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, string, string) error); ok {
+	if rf, ok := ret.Get(1).(func(int, string, string) error); ok {
 		r1 = rf(user, id, path)
 	} else {
 		r1 = ret.Error(1)
