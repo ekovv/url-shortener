@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"sync/atomic"
 	"url-shortener/internal/storage"
 )
@@ -27,14 +28,15 @@ func NewSessionService(storage storage.Storage) (SessionService, error) {
 	}, nil
 }
 
-func (s *SessionService) CreateIfNotExists(session string) int {
-	a, ok := s.sessMap[session]
-	if !ok {
-		s.count.Add(1)
-		intID := int(s.count.Load())
-		s.sessMap[session] = intID
-		return intID
-	} else {
-		return a
-	}
+func (s *SessionService) CreateIfNotExists() (string, int) {
+	s.count.Add(1)
+	intID := int(s.count.Load())
+	session := uuid.New().String()
+	s.sessMap[session] = intID
+	return session, intID
+}
+
+func (s *SessionService) GetID(session string) int {
+	id := s.sessMap[session]
+	return id
 }

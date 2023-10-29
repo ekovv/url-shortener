@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	_ "github.com/lib/pq"
 	"github.com/speps/go-hashids/v2"
 	"math/rand"
@@ -25,10 +24,10 @@ func NewService(storage storage.Storage, config config.Config) (Service, error) 
 	}, nil
 }
 
-func GenerateUUID() string {
-	newToken := uuid.New().String()
-	return newToken
-}
+//func GenerateUUID() string {
+//	newToken := uuid.New().String()
+//	return newToken
+//}
 
 func (s *Service) GetShort(user int, path string) (string, error) {
 	short := s.getShortURL()

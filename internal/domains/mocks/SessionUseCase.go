@@ -9,8 +9,29 @@ type SessionUseCase struct {
 	mock.Mock
 }
 
-// CreateIfNotExists provides a mock function with given fields: session
-func (_m *SessionUseCase) CreateIfNotExists(session string) int {
+// CreateIfNotExists provides a mock function with given fields:
+func (_m *SessionUseCase) CreateIfNotExists() (string, int) {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 int
+	if rf, ok := ret.Get(1).(func() int); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Get(1).(int)
+	}
+
+	return r0, r1
+}
+
+// GetID provides a mock function with given fields: session
+func (_m *SessionUseCase) GetID(session string) int {
 	ret := _m.Called(session)
 
 	var r0 int

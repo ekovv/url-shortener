@@ -10,7 +10,6 @@ import (
 	"url-shortener/config"
 	"url-shortener/internal/domains"
 	myLog "url-shortener/internal/logger"
-	"url-shortener/internal/service"
 	"url-shortener/internal/storage"
 )
 
@@ -49,12 +48,13 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 
 	}
 	var id int
+	var session string
 	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.sessionService.CreateIfNotExists(token)
+		id = s.sessionService.GetID(token)
 	} else {
-		newToken := s.SetSession(c)
-		id = s.sessionService.CreateIfNotExists(newToken)
+		session, id = s.sessionService.CreateIfNotExists()
+		s.SetSession(c, session)
 	}
 	str := string(body)
 	short, err := s.service.GetShort(id, str)
@@ -72,12 +72,13 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 func (s *Handler) GetLongURL(c *gin.Context) {
 	idOfParam := c.Param("id")
 	var id int
+	var session string
 	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.sessionService.CreateIfNotExists(token)
+		id = s.sessionService.GetID(token)
 	} else {
-		newToken := s.SetSession(c)
-		id = s.sessionService.CreateIfNotExists(newToken)
+		session, id = s.sessionService.CreateIfNotExists()
+		s.SetSession(c, session)
 	}
 	long, err := s.service.GetLong(id, idOfParam)
 	if long == "" && err == nil {
@@ -101,12 +102,13 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 		return
 	}
 	var id int
+	var session string
 	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.sessionService.CreateIfNotExists(token)
+		id = s.sessionService.GetID(token)
 	} else {
-		newToken := s.SetSession(c)
-		id = s.sessionService.CreateIfNotExists(newToken)
+		session, id = s.sessionService.CreateIfNotExists()
+		s.SetSession(c, session)
 	}
 	short, err := s.service.GetShort(id, js.URI)
 	fmt.Println(short)
@@ -157,12 +159,13 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		return
 	}
 	var id int
+	var session string
 	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.sessionService.CreateIfNotExists(token)
+		id = s.sessionService.GetID(token)
 	} else {
-		newToken := s.SetSession(c)
-		id = s.sessionService.CreateIfNotExists(newToken)
+		session, id = s.sessionService.CreateIfNotExists()
+		s.SetSession(c, session)
 	}
 	for _, i := range input {
 		short, err := s.service.SaveWithoutGenerate(id, i.ID, i.Origin)
@@ -185,7 +188,7 @@ func (s *Handler) GetAll(c *gin.Context) {
 	var id int
 	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.sessionService.CreateIfNotExists(token)
+		id = s.sessionService.GetID(token)
 	} else {
 		c.Status(http.StatusNoContent)
 		return
@@ -211,17 +214,15 @@ func (s *Handler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func (s *Handler) SetSession(c *gin.Context) string {
-	uuid := service.GenerateUUID()
-	c.SetCookie("token", uuid, 3600, "", "localhost", false, true)
-	return uuid
+func (s *Handler) SetSession(c *gin.Context, session string) {
+	c.SetCookie("token", session, 3600, "", "localhost", false, true)
 }
 
 func (s *Handler) Del(c *gin.Context) {
 	var id int
 	token, err := c.Cookie("token")
 	if err == nil {
-		id = s.sessionService.CreateIfNotExists(token)
+		id = s.sessionService.GetID(token)
 	} else {
 		c.Status(http.StatusNoContent)
 		return
