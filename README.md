@@ -1,6 +1,10 @@
 # go-musthave-shortener-tpl
 # 🎲 Service on Go(Gin) for shortening url using a special algorithm and storing in a database/file/memory 🎲
 
+# 🎬 Description 
+
+Receives a link to a web resource from the client and, using a text reduction algorithm, shortens it and saves it in storage (your choice: memory, file, database) and sends it back. The new short link will automatically redirect all clients to the original (longer) link.
+
 # 📞 Endpoints
 ```http
 POST /
