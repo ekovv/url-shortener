@@ -18,6 +18,7 @@ GET /api/user/urls
 DELETE /api/user/urls
 - Delete links
 ```
+
 # 🏴‍☠️ Flags
 ```
 a - ip for REST -a=host
