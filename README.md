@@ -11,5 +11,11 @@
   "database_dsn" : "..."
 }
 
-
+ 1. {
+ 2.  "properties": 
+ 3.     {
+ 4.      "name": "Martin",
+ 5.      "bornOn": "1957-01-05"
+ 6.     },
+ 7. }
 
