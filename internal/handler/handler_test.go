@@ -62,7 +62,6 @@ func TestHandler_UpdateAndGetShort(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			request := httptest.NewRequest(http.MethodPost, path, strings.NewReader(tt.body))
-			// создаём новый Recorder
 
 			g.ServeHTTP(w, request)
 
