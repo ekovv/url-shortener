@@ -178,7 +178,6 @@ func (s *Handler) GetBatch(c *gin.Context) {
 		res = append(res, i)
 
 	}
-	//res = append(res, string(bytes))
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusCreated, res)
 
