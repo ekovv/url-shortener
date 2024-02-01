@@ -48,6 +48,7 @@ func BenchmarkHandler_GetLongURL(b *testing.B) {
 			s++
 		}
 	})
+
 	uindex := 0
 	router = gin.Default()
 	router.GET("/:id", handler.GetLongURL)
