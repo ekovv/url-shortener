@@ -86,7 +86,6 @@ func (s *Handler) GetLongURL(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		fmt.Println("Error getting")
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
