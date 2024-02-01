@@ -1,6 +1,6 @@
 module url-shortener
 
-go 1.21
+go 1.21.6
 
 require (
 	github.com/gin-contrib/gzip v0.0.6
