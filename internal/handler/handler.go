@@ -7,6 +7,7 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	_ "net/http/pprof"
 	"url-shortener/config"
 	"url-shortener/internal/domains"
 	myLog "url-shortener/internal/logger"
