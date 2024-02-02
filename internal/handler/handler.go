@@ -46,7 +46,6 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
-
 	}
 
 	var id int
