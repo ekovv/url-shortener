@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"go.uber.org/zap"
 	"log"
 	"url-shortener/config"
@@ -15,7 +14,7 @@ func main() {
 	conf := config.New()
 	stM, err := storage.New(conf)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalf("Error creating storage: %s", err)
 		return
 	}
 	sr, err := service.NewService(stM, conf)
