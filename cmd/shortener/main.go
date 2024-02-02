@@ -23,6 +23,7 @@ func main() {
 		log.Fatalf("Error creating service: %s", err)
 		return
 	}
+
 	ss, err := service.NewSessionService(stM)
 	if err != nil {
 		log.Fatalf("Error creating service: %s", err)
