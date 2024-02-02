@@ -189,7 +189,7 @@ func (s *Handler) GetAll(c *gin.Context) {
 	if err == nil {
 		id = s.sessionService.GetID(token)
 	} else {
-		c.Status(http.StatusNoContent)
+		c.Status(http.StatusUnauthorized)
 		return
 	}
 	urlsFrom, err := s.service.GetAllUrls(id)
