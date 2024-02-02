@@ -48,6 +48,7 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 		return
 
 	}
+
 	var id int
 	var session string
 	token, err := c.Cookie("token")
