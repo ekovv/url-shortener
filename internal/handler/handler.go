@@ -69,6 +69,7 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 		return
 	}
 	c.String(http.StatusCreated, short)
+
 }
 
 func (s *Handler) GetLongURL(c *gin.Context) {
@@ -102,6 +103,7 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
+
 	var id int
 	var session string
 	token, err := c.Cookie("token")
