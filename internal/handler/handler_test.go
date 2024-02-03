@@ -3,13 +3,14 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"url-shortener/config"
 	"url-shortener/internal/domains/mocks"
+
+	"github.com/gin-gonic/gin"
 )
 
 type serviceMock func(c *mocks.UseCase)

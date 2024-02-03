@@ -3,13 +3,14 @@ package service
 import (
 	"errors"
 	"fmt"
-	_ "github.com/lib/pq"
-	"github.com/speps/go-hashids/v2"
 	"math/rand"
 	"strconv"
 	"time"
 	"url-shortener/config"
 	"url-shortener/internal/storage"
+
+	_ "github.com/lib/pq"
+	"github.com/speps/go-hashids/v2"
 )
 
 type Service struct {

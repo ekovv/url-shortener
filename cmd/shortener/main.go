@@ -1,13 +1,14 @@
 package main
 
 import (
-	"go.uber.org/zap"
 	"log"
 	"url-shortener/config"
 	"url-shortener/internal/handler"
 	myLog "url-shortener/internal/logger"
 	"url-shortener/internal/service"
 	"url-shortener/internal/storage"
+
+	"go.uber.org/zap"
 )
 
 func main() {

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io"
 	"log"
 	"net/http/httptest"
@@ -11,6 +10,8 @@ import (
 	"url-shortener/config"
 	"url-shortener/internal/service"
 	"url-shortener/internal/storage"
+
+	"github.com/gin-gonic/gin"
 )
 
 func BenchmarkHandler_GetLongURL(b *testing.B) {

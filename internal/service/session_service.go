@@ -2,9 +2,10 @@ package service
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"sync/atomic"
 	"url-shortener/internal/storage"
+
+	"github.com/google/uuid"
 )
 
 type SessionService struct {

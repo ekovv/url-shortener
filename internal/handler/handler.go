@@ -4,14 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gin-contrib/gzip"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	_ "net/http/pprof"
 	"url-shortener/config"
 	"url-shortener/internal/domains"
 	myLog "url-shortener/internal/logger"
 	"url-shortener/internal/storage"
+
+	"github.com/gin-contrib/gzip"
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
