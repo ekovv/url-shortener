@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+// FileStorage as
 type FileStorage struct {
 	Path  string
 	File  *os.File

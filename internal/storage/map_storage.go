@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// MapStorage as
 type MapStorage struct {
 	m map[string]URLInfo
 }
