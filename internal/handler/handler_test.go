@@ -3,16 +3,13 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"log"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"url-shortener/config"
 	"url-shortener/internal/domains/mocks"
-	"url-shortener/internal/service"
-
-	"github.com/gin-gonic/gin"
 )
 
 type serviceMock func(c *mocks.UseCase)
@@ -198,22 +195,4 @@ func TestHandler_GetShortByJSON(t *testing.T) {
 			}
 		})
 	}
-}
-
-func ExampleHandler_GetConnection() {
-	s := service.Service{}
-	h := Handler{service: &s}
-
-	// Создаем новый контекст Gin
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-
-	// Вызываем функцию GetConnection
-	h.GetConnection(c)
-
-	// Проверяем статус ответа
-	if w.Code != http.StatusOK {
-		log.Fatalf("Expected HTTP 200 OK, got: %v", w.Code)
-	}
-	// Check connection
 }

@@ -104,10 +104,12 @@ func (s *DBStorage) GetLong(user int, short string) (string, error) {
 	return original, nil
 }
 
+// Close as
 func (s *DBStorage) Close() error {
 	return s.conn.Close()
 }
 
+// CheckConnection as
 func (s *DBStorage) CheckConnection() error {
 	if err := s.conn.Ping(); err != nil {
 		return fmt.Errorf("failed to connect to db %w", err)
@@ -115,6 +117,7 @@ func (s *DBStorage) CheckConnection() error {
 	return nil
 }
 
+// GetAll as
 func (s *DBStorage) GetAll(user int) ([]URL, error) {
 	query := "SELECT original, short FROM urls WHERE cookie = $1"
 	var list []URL
@@ -137,6 +140,7 @@ func (s *DBStorage) GetAll(user int) ([]URL, error) {
 	return list, nil
 }
 
+// DeleteUrls as
 func (s *DBStorage) DeleteUrls(list []string, user int) error {
 	for _, i := range list {
 		query := "UPDATE urls SET del = true WHERE short = $1 AND cookie = $2"

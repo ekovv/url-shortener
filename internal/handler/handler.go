@@ -225,11 +225,12 @@ func (s *Handler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// SetSession as
 func (s *Handler) SetSession(c *gin.Context, session string) {
 	c.SetCookie("token", session, 3600, "", "localhost", false, true)
 }
 
-// Delete links
+// Del Delete links
 func (s *Handler) Del(c *gin.Context) {
 	var id int
 	token, err := c.Cookie("token")
