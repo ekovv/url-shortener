@@ -12,10 +12,12 @@ import (
 	"github.com/lib/pq"
 )
 
+// DBStorage sa
 type DBStorage struct {
 	conn *sql.DB
 }
 
+// GetLastID sa
 func (s *DBStorage) GetLastID() (int, error) {
 	var lastID sql.NullInt64
 	err := s.conn.QueryRow("SELECT MAX(id) FROM urls").Scan(&lastID)
@@ -30,6 +32,7 @@ func (s *DBStorage) GetLastID() (int, error) {
 	return 0, nil
 }
 
+// NewDBStorage sa
 func NewDBStorage(config config.Config) (*DBStorage, error) {
 	db, err := sql.Open("postgres", config.DB)
 	if err != nil {
@@ -56,8 +59,10 @@ func NewDBStorage(config config.Config) (*DBStorage, error) {
 	return s, s.CheckConnection()
 }
 
+// ErrAlreadyExists sa
 var ErrAlreadyExists = errors.New("already have")
 
+// Save sa
 func (s *DBStorage) Save(user int, shortURL string, path string) error {
 	insertQuery := `INSERT INTO urls(original, short, cookie, del) VALUES ($1, $2, $3, $4)`
 	_, err := s.conn.Exec(insertQuery, path, shortURL, user, false)
@@ -73,6 +78,7 @@ func (s *DBStorage) Save(user int, shortURL string, path string) error {
 	return nil
 }
 
+// GetShortIfHave sa
 func (s *DBStorage) GetShortIfHave(user int, path string) (string, error) {
 	query := "SELECT short FROM urls WHERE original = $1 AND cookie = $2"
 	var short string
@@ -83,6 +89,7 @@ func (s *DBStorage) GetShortIfHave(user int, path string) (string, error) {
 	return short, nil
 }
 
+// GetLong sa
 func (s *DBStorage) GetLong(user int, short string) (string, error) {
 	query := "SELECT original, del FROM urls WHERE short = $1"
 	var original string

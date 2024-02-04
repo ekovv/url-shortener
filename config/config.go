@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// Config sa
 type Config struct {
 	Host    string
 	BaseURL string
@@ -15,6 +16,7 @@ type Config struct {
 	Storage string
 }
 
+// F sa
 type F struct {
 	host    *string
 	baseURL *string
@@ -33,6 +35,7 @@ func init() {
 	f.db = flag.String("d", "", "-d=db")
 }
 
+// New sa
 func New() (c Config) {
 	flag.Parse()
 	if envRunAddr := os.Getenv("SERVER_ADDRESS"); envRunAddr != "" {

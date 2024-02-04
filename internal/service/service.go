@@ -13,11 +13,13 @@ import (
 	"github.com/speps/go-hashids/v2"
 )
 
+// Service sa
 type Service struct {
 	Storage storage.Storage
 	config  config.Config
 }
 
+// NewService sa
 func NewService(storage storage.Storage, config config.Config) (Service, error) {
 	return Service{
 		Storage: storage,
@@ -25,11 +27,7 @@ func NewService(storage storage.Storage, config config.Config) (Service, error) 
 	}, nil
 }
 
-//func GenerateUUID() string {
-//	newToken := uuid.New().String()
-//	return newToken
-//}
-
+// GetShort as
 func (s *Service) GetShort(user int, path string) (string, error) {
 	short := s.getShortURL()
 	err := s.Storage.Save(user, short, path)
@@ -46,6 +44,7 @@ func (s *Service) GetShort(user int, path string) (string, error) {
 	return s.config.BaseURL + short, nil
 }
 
+// GetLong sa
 func (s *Service) GetLong(user int, shortURL string) (string, error) {
 	long, err := s.Storage.GetLong(user, shortURL)
 	if long == "" && err == nil {
@@ -57,6 +56,7 @@ func (s *Service) GetLong(user int, shortURL string) (string, error) {
 	return long, nil
 }
 
+// CheckConn sa
 func (s *Service) CheckConn() error {
 	err := s.Storage.CheckConnection()
 	if err != nil {
@@ -65,6 +65,7 @@ func (s *Service) CheckConn() error {
 	return nil
 }
 
+// SaveWithoutGenerate sa
 func (s *Service) SaveWithoutGenerate(user int, id string, path string) (string, error) {
 	err := s.Storage.Save(user, id, path)
 	if err != nil {
@@ -102,6 +103,7 @@ func (s *Service) getShortURL() string {
 	return e
 }
 
+// GetAllUrls sa
 func (s *Service) GetAllUrls(user int) ([]storage.URL, error) {
 	list, err := s.Storage.GetAll(user)
 	if err != nil {
@@ -110,6 +112,7 @@ func (s *Service) GetAllUrls(user int) ([]storage.URL, error) {
 	return list, nil
 }
 
+// Delete sa
 func (s *Service) Delete(list []string, id int) error {
 	err := s.Storage.DeleteUrls(list, id)
 	if err != nil {

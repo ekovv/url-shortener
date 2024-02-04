@@ -15,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Handler sa
 type Handler struct {
 	service        domains.UseCase
 	sessionService domains.SessionUseCase
@@ -22,6 +23,7 @@ type Handler struct {
 	config         config.Config
 }
 
+// NewHandler sa
 func NewHandler(service domains.UseCase, sessionService domains.SessionUseCase, conf config.Config) *Handler {
 	router := gin.Default()
 	h := &Handler{

@@ -5,6 +5,7 @@ import (
 	"url-shortener/config"
 )
 
+// Storage sa
 type Storage interface {
 	Save(user int, shortURL string, path string) error
 	GetShortIfHave(user int, path string) (string, error)
@@ -16,6 +17,7 @@ type Storage interface {
 	DeleteUrls(list []string, user int) error
 }
 
+// New sa
 func New(cfg config.Config) (Storage, error) {
 	switch cfg.Storage {
 	case "db":

@@ -8,12 +8,14 @@ import (
 	"github.com/google/uuid"
 )
 
+// SessionService sa
 type SessionService struct {
 	storage storage.Storage
 	sessMap map[string]int
 	count   *atomic.Uint64
 }
 
+// NewSessionService sa
 func NewSessionService(storage storage.Storage) (SessionService, error) {
 	lastID, err := storage.GetLastID()
 	if err != nil {
@@ -29,6 +31,7 @@ func NewSessionService(storage storage.Storage) (SessionService, error) {
 	}, nil
 }
 
+// CreateIfNotExists sa
 func (s *SessionService) CreateIfNotExists() (string, int) {
 	s.count.Add(1)
 	intID := int(s.count.Load())
@@ -37,6 +40,7 @@ func (s *SessionService) CreateIfNotExists() (string, int) {
 	return session, intID
 }
 
+// GetID sa
 func (s *SessionService) GetID(session string) int {
 	id := s.sessMap[session]
 	return id

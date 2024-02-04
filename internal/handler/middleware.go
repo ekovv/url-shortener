@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// AcceptEncoding sa
 func (s *Handler) AcceptEncoding() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		acceptEncoding := c.GetHeader("accept-encoding")
@@ -18,6 +19,7 @@ func (s *Handler) AcceptEncoding() gin.HandlerFunc {
 	}
 }
 
+// Decompressed sa
 func (s *Handler) Decompressed() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.Header.Get("Content-Encoding") == "gzip" {
