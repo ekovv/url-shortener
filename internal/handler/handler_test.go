@@ -197,3 +197,7 @@ func TestHandler_GetShortByJSON(t *testing.T) {
 		})
 	}
 }
+
+func ExampleHandler_GetConnection() {
+	// Check connection
+}

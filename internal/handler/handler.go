@@ -38,10 +38,12 @@ func NewHandler(service domains.UseCase, sessionService domains.SessionUseCase, 
 	return h
 }
 
+// Start server
 func (s *Handler) Start() {
 	s.engine.Run(s.config.Host)
 }
 
+// UpdateAndGetShort Compress links
 func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 	body, err := c.GetRawData()
 	if err != nil {
@@ -72,6 +74,7 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 
 }
 
+// GetLongURL Get long links
 func (s *Handler) GetLongURL(c *gin.Context) {
 	idOfParam := c.Param("id")
 	var id int
@@ -96,6 +99,7 @@ func (s *Handler) GetLongURL(c *gin.Context) {
 	c.Header("Location", long)
 }
 
+// GetShortByJSON Get short links with json
 func (s *Handler) GetShortByJSON(c *gin.Context) {
 	var js uriJSON
 	err := c.ShouldBindJSON(&js)
@@ -144,6 +148,7 @@ func (s *Handler) GetShortByJSON(c *gin.Context) {
 	c.Writer.Write(bytes)
 }
 
+// GetConnection Check connection
 func (s *Handler) GetConnection(c *gin.Context) {
 	err := s.service.CheckConn()
 	if err != nil {
@@ -152,6 +157,7 @@ func (s *Handler) GetConnection(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+// GetBatch Get json with long and short links
 func (s *Handler) GetBatch(c *gin.Context) {
 	var input []jBatch
 	var res []jBatch
@@ -186,6 +192,7 @@ func (s *Handler) GetBatch(c *gin.Context) {
 
 }
 
+// GetAll Get all links
 func (s *Handler) GetAll(c *gin.Context) {
 	var id int
 	token, err := c.Cookie("token")
@@ -220,6 +227,7 @@ func (s *Handler) SetSession(c *gin.Context, session string) {
 	c.SetCookie("token", session, 3600, "", "localhost", false, true)
 }
 
+// Delete links
 func (s *Handler) Del(c *gin.Context) {
 	var id int
 	token, err := c.Cookie("token")
