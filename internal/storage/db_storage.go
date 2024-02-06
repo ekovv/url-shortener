@@ -12,12 +12,12 @@ import (
 	"github.com/lib/pq"
 )
 
-// DBStorage sa
+// DBStorage struct
 type DBStorage struct {
 	conn *sql.DB
 }
 
-// GetLastID sa
+// GetLastID get last id
 func (s *DBStorage) GetLastID() (int, error) {
 	var lastID sql.NullInt64
 	err := s.conn.QueryRow("SELECT MAX(id) FROM urls").Scan(&lastID)
@@ -32,7 +32,7 @@ func (s *DBStorage) GetLastID() (int, error) {
 	return 0, nil
 }
 
-// NewDBStorage sa
+// NewDBStorage constructor
 func NewDBStorage(config config.Config) (*DBStorage, error) {
 	db, err := sql.Open("postgres", config.DB)
 	if err != nil {
@@ -59,10 +59,10 @@ func NewDBStorage(config config.Config) (*DBStorage, error) {
 	return s, s.CheckConnection()
 }
 
-// ErrAlreadyExists sa
+// ErrAlreadyExists err
 var ErrAlreadyExists = errors.New("already have")
 
-// Save sa
+// Save save in db
 func (s *DBStorage) Save(user int, shortURL string, path string) error {
 	insertQuery := `INSERT INTO urls(original, short, cookie, del) VALUES ($1, $2, $3, $4)`
 	_, err := s.conn.Exec(insertQuery, path, shortURL, user, false)
@@ -78,7 +78,7 @@ func (s *DBStorage) Save(user int, shortURL string, path string) error {
 	return nil
 }
 
-// GetShortIfHave sa
+// GetShortIfHave get short
 func (s *DBStorage) GetShortIfHave(user int, path string) (string, error) {
 	query := "SELECT short FROM urls WHERE original = $1 AND cookie = $2"
 	var short string
@@ -89,8 +89,8 @@ func (s *DBStorage) GetShortIfHave(user int, path string) (string, error) {
 	return short, nil
 }
 
-// GetLong sa
-func (s *DBStorage) GetLong(user int, short string) (string, error) {
+// GetLong get long
+func (s *DBStorage) GetLong(userID int, short string) (string, error) {
 	query := "SELECT original, del FROM urls WHERE short = $1"
 	var original string
 	var deleted bool
@@ -104,12 +104,12 @@ func (s *DBStorage) GetLong(user int, short string) (string, error) {
 	return original, nil
 }
 
-// Close as
+// Close connection close
 func (s *DBStorage) Close() error {
 	return s.conn.Close()
 }
 
-// CheckConnection as
+// CheckConnection check connection
 func (s *DBStorage) CheckConnection() error {
 	if err := s.conn.Ping(); err != nil {
 		return fmt.Errorf("failed to connect to db %w", err)
@@ -117,11 +117,11 @@ func (s *DBStorage) CheckConnection() error {
 	return nil
 }
 
-// GetAll as
-func (s *DBStorage) GetAll(user int) ([]URL, error) {
+// GetAll get all
+func (s *DBStorage) GetAll(userID int) ([]URL, error) {
 	query := "SELECT original, short FROM urls WHERE cookie = $1"
 	var list []URL
-	rows, err := s.conn.Query(query, user)
+	rows, err := s.conn.Query(query, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to getall urls: %w", err)
 	}
@@ -140,11 +140,11 @@ func (s *DBStorage) GetAll(user int) ([]URL, error) {
 	return list, nil
 }
 
-// DeleteUrls as
-func (s *DBStorage) DeleteUrls(list []string, user int) error {
+// DeleteUrls delete urls
+func (s *DBStorage) DeleteUrls(list []string, userID int) error {
 	for _, i := range list {
 		query := "UPDATE urls SET del = true WHERE short = $1 AND cookie = $2"
-		_, err := s.conn.Exec(query, i, user)
+		_, err := s.conn.Exec(query, i, userID)
 		if err != nil {
 			return fmt.Errorf("failed to delete %w", err)
 		}

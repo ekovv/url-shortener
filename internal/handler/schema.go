@@ -5,7 +5,7 @@ type uriJSON struct {
 	Res string `json:"result"`
 }
 
-type jBatch struct {
+type batch struct {
 	ID     string `json:"correlation_id,omitempty"`
 	Origin string `json:"original_url,omitempty"`
 	Short  string `json:"short_url,omitempty"`

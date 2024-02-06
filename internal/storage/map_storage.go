@@ -5,23 +5,23 @@ import (
 	"fmt"
 )
 
-// MapStorage as
+// MapStorage struct
 type MapStorage struct {
 	m map[string]URLInfo
 }
 
-// DeleteUrls sa
+// DeleteUrls del urls
 func (s *MapStorage) DeleteUrls(list []string, user int) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-// GetLastID sa
+// GetLastID get last id
 func (s *MapStorage) GetLastID() (int, error) {
 	return len(s.m), nil
 }
 
-// CheckConnection sa
+// CheckConnection check
 func (s *MapStorage) CheckConnection() error {
 	if s.m == nil {
 		return errors.New("map nil")
@@ -29,13 +29,13 @@ func (s *MapStorage) CheckConnection() error {
 	return nil
 }
 
-// Close sa
+// Close mapClose
 func (s *MapStorage) Close() error {
 	s.m = nil
 	return nil
 }
 
-// NewMapStorage sa
+// NewMapStorage constructor
 func NewMapStorage() *MapStorage {
 	return &MapStorage{
 		m: make(map[string]URLInfo),
@@ -43,14 +43,14 @@ func NewMapStorage() *MapStorage {
 
 }
 
-// Save sa
+// Save saveInMap
 func (s *MapStorage) Save(user int, shortURL string, path string) error {
 	ur := URLInfo{Original: path, User: user}
 	s.m[shortURL] = ur
 	return nil
 }
 
-// GetShortIfHave sa
+// GetShortIfHave get short
 func (s *MapStorage) GetShortIfHave(user int, path string) (string, error) {
 	for key, value := range s.m {
 		if value.Original == path && value.User == user {
@@ -60,7 +60,7 @@ func (s *MapStorage) GetShortIfHave(user int, path string) (string, error) {
 	return "", fmt.Errorf("not found")
 }
 
-// GetLong sa
+// GetLong get long
 func (s *MapStorage) GetLong(_ int, urlShort string) (string, error) {
 	ur, ok := s.m[urlShort]
 	if !ok {
@@ -70,7 +70,7 @@ func (s *MapStorage) GetLong(_ int, urlShort string) (string, error) {
 	return ur.Original, nil
 }
 
-// GetAll sa
+// GetAll get all
 func (s *MapStorage) GetAll(user int) ([]URL, error) {
 	var result []URL
 	for key, value := range s.m {

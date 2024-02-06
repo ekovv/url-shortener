@@ -8,20 +8,20 @@ import (
 	"strconv"
 )
 
-// FileStorage as
+// FileStorage struct
 type FileStorage struct {
 	Path  string
 	File  *os.File
 	count int
 }
 
-// DeleteUrls sa
+// DeleteUrls delete
 func (s *FileStorage) DeleteUrls(list []string, user int) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-// GetLastID sa
+// GetLastID get last id
 func (s *FileStorage) GetLastID() (int, error) {
 	scanner := bufio.NewScanner(s.File)
 
@@ -33,7 +33,7 @@ func (s *FileStorage) GetLastID() (int, error) {
 	return count, nil
 }
 
-// CheckConnection sa
+// CheckConnection check connection
 func (s *FileStorage) CheckConnection() error {
 	if s.File == nil {
 		return fmt.Errorf("file not open")
@@ -42,7 +42,7 @@ func (s *FileStorage) CheckConnection() error {
 
 }
 
-// NewFileStorage sa
+// NewFileStorage constructor
 func NewFileStorage(path string) (*FileStorage, error) {
 	fs := &FileStorage{
 		Path:  path,
@@ -56,7 +56,7 @@ func NewFileStorage(path string) (*FileStorage, error) {
 	return fs, nil
 }
 
-// Open sa
+// Open open file
 func (s *FileStorage) Open() error {
 	file, err := os.OpenFile(s.Path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
@@ -66,12 +66,12 @@ func (s *FileStorage) Open() error {
 	return nil
 }
 
-// Close sa
+// Close fileCLose
 func (s *FileStorage) Close() error {
 	return s.File.Close()
 }
 
-// Save sa
+// Save save in file
 func (s *FileStorage) Save(user int, short string, long string) error {
 	flag := false
 	var f = inFile{
@@ -95,7 +95,7 @@ func (s *FileStorage) Save(user int, short string, long string) error {
 	return nil
 }
 
-// GetShortIfHave sa
+// GetShortIfHave get short
 func (s *FileStorage) GetShortIfHave(user int, path string) (string, error) {
 	err := s.Open()
 	if err != nil {
@@ -130,7 +130,7 @@ type inFile struct {
 	Del   bool   `json:"is_deleted"`
 }
 
-// GetLong sa
+// GetLong get long
 func (s *FileStorage) GetLong(user int, short string) (string, error) {
 	err := s.Open()
 	if err != nil {
@@ -158,7 +158,7 @@ func (s *FileStorage) GetLong(user int, short string) (string, error) {
 	return "", nil
 }
 
-// GetAll sa
+// GetAll get all
 func (s *FileStorage) GetAll(user int) ([]URL, error) {
 	err := s.Open()
 	if err != nil {

@@ -5,10 +5,10 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar sa
+// Sugar var
 var Sugar zap.SugaredLogger
 
-// HTTPLogger sa
+// HTTPLogger logger with gin
 func HTTPLogger() gin.HandlerFunc {
 	return gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 		Sugar.Info(

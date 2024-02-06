@@ -15,16 +15,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Handler sa
+// Handler struct
 type Handler struct {
 	service        domains.UseCase
-	sessionService domains.SessionUseCase
+	sessionService domains.SessionService
 	engine         *gin.Engine
 	config         config.Config
 }
 
-// NewHandler sa
-func NewHandler(service domains.UseCase, sessionService domains.SessionUseCase, conf config.Config) *Handler {
+// NewHandler constructor with initialization gin
+func NewHandler(service domains.UseCase, sessionService domains.SessionService, conf config.Config) *Handler {
 	router := gin.Default()
 	h := &Handler{
 		service:        service,
@@ -56,11 +56,11 @@ func (s *Handler) UpdateAndGetShort(c *gin.Context) {
 	var id int
 	var session string
 	token, err := c.Cookie("token")
-	if err == nil {
-		id = s.sessionService.GetID(token)
-	} else {
+	if err != nil {
 		session, id = s.sessionService.CreateIfNotExists()
 		s.SetSession(c, session)
+	} else {
+		id = s.sessionService.GetID(token)
 	}
 	str := string(body)
 	short, err := s.service.GetShort(id, str)
@@ -161,8 +161,8 @@ func (s *Handler) GetConnection(c *gin.Context) {
 
 // GetBatch Get json with long and short links
 func (s *Handler) GetBatch(c *gin.Context) {
-	var input []jBatch
-	var res []jBatch
+	var input []batch
+	var res []batch
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
 		_ = fmt.Errorf("error opening file storage %w", err)
@@ -214,9 +214,9 @@ func (s *Handler) GetAll(c *gin.Context) {
 		c.Status(http.StatusNoContent)
 		return
 	}
-	var res []jBatch
+	var res []batch
 	for _, i := range urlsFrom {
-		batch := jBatch{}
+		batch := batch{}
 		batch.Origin = i.Original
 		batch.Short = s.config.BaseURL + i.Short
 		res = append(res, batch)
@@ -225,7 +225,7 @@ func (s *Handler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-// SetSession as
+// SetSession Set session for user
 func (s *Handler) SetSession(c *gin.Context, session string) {
 	c.SetCookie("token", session, 3600, "", "localhost", false, true)
 }

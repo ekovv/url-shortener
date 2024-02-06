@@ -13,13 +13,13 @@ import (
 	"github.com/speps/go-hashids/v2"
 )
 
-// Service sa
+// Service struct
 type Service struct {
 	Storage storage.Storage
 	config  config.Config
 }
 
-// NewService sa
+// NewService constructs a new Service
 func NewService(storage storage.Storage, config config.Config) (Service, error) {
 	return Service{
 		Storage: storage,
@@ -27,13 +27,13 @@ func NewService(storage storage.Storage, config config.Config) (Service, error) 
 	}, nil
 }
 
-// GetShort as
-func (s *Service) GetShort(user int, path string) (string, error) {
+// GetShort save long
+func (s *Service) GetShort(userID int, path string) (string, error) {
 	short := s.getShortURL()
-	err := s.Storage.Save(user, short, path)
+	err := s.Storage.Save(userID, short, path)
 	if err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
-			short, err := s.Storage.GetShortIfHave(user, path)
+			short, err := s.Storage.GetShortIfHave(userID, path)
 			if err != nil {
 				return "", err
 			}
@@ -44,9 +44,9 @@ func (s *Service) GetShort(user int, path string) (string, error) {
 	return s.config.BaseURL + short, nil
 }
 
-// GetLong sa
-func (s *Service) GetLong(user int, shortURL string) (string, error) {
-	long, err := s.Storage.GetLong(user, shortURL)
+// GetLong get long with short
+func (s *Service) GetLong(userID int, shortURL string) (string, error) {
+	long, err := s.Storage.GetLong(userID, shortURL)
 	if long == "" && err == nil {
 		return "", nil
 	}
@@ -56,7 +56,7 @@ func (s *Service) GetLong(user int, shortURL string) (string, error) {
 	return long, nil
 }
 
-// CheckConn sa
+// CheckConn check connection to db
 func (s *Service) CheckConn() error {
 	err := s.Storage.CheckConnection()
 	if err != nil {
@@ -65,12 +65,12 @@ func (s *Service) CheckConn() error {
 	return nil
 }
 
-// SaveWithoutGenerate sa
-func (s *Service) SaveWithoutGenerate(user int, id string, path string) (string, error) {
-	err := s.Storage.Save(user, id, path)
+// SaveWithoutGenerate save links without generate
+func (s *Service) SaveWithoutGenerate(userID int, id string, path string) (string, error) {
+	err := s.Storage.Save(userID, id, path)
 	if err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
-			short, err := s.Storage.GetShortIfHave(user, path)
+			short, err := s.Storage.GetShortIfHave(userID, path)
 			if err != nil {
 				return "", err
 			}
@@ -103,16 +103,16 @@ func (s *Service) getShortURL() string {
 	return e
 }
 
-// GetAllUrls sa
-func (s *Service) GetAllUrls(user int) ([]storage.URL, error) {
-	list, err := s.Storage.GetAll(user)
+// GetAllUrls get all from db
+func (s *Service) GetAllUrls(userID int) ([]storage.URL, error) {
+	list, err := s.Storage.GetAll(userID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting %w", err)
 	}
 	return list, nil
 }
 
-// Delete sa
+// Delete delete urls in db
 func (s *Service) Delete(list []string, id int) error {
 	err := s.Storage.DeleteUrls(list, id)
 	if err != nil {
