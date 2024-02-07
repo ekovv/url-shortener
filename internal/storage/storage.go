@@ -5,14 +5,19 @@ import (
 	"url-shortener/config"
 )
 
+// Storage sa
 type Storage interface {
-	Save(shortURL string, path string) error
-	GetShortIfHave(path string) (string, error)
-	GetLong(short string) (string, error)
+	Save(user int, shortURL string, path string) error
+	GetShortIfHave(user int, path string) (string, error)
+	GetLong(user int, short string) (string, error)
 	Close() error
 	CheckConnection() error
+	GetAll(user int) ([]URL, error)
+	GetLastID() (int, error)
+	DeleteUrls(list []string, user int) error
 }
 
+// New sa
 func New(cfg config.Config) (Storage, error) {
 	switch cfg.Storage {
 	case "db":
