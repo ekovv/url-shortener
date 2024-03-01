@@ -20,6 +20,7 @@ type DBStorage struct {
 // GetLastID get last id
 func (s *DBStorage) GetLastID() (int, error) {
 	var lastID sql.NullInt64
+
 	err := s.conn.QueryRow("SELECT MAX(id) FROM urls").Scan(&lastID)
 	if err != nil {
 		return 0, err
