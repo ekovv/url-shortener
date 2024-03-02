@@ -32,6 +32,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 					}
 				}
 			}
+
 			return true
 		})
 	}
