@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"url-shortener/config"
 	"url-shortener/internal/handler"
@@ -11,7 +12,16 @@ import (
 	"go.uber.org/zap"
 )
 
+var (
+	buildVersion = "N/A"
+	buildDate    = "N/A"
+	buildCommit  = "N/A"
+)
+
 func main() {
+	fmt.Println("Build version:", buildVersion)
+	fmt.Println("Build date:", buildDate)
+	fmt.Println("Build commit:", buildCommit)
 	conf := config.New()
 	stM, err := storage.New(conf)
 	if err != nil {
