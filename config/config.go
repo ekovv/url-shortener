@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Host    string
 	BaseURL string
+	TLS     bool
 	File    string
 	DB      string
 	Storage string
@@ -20,6 +21,7 @@ type Config struct {
 type F struct {
 	host    *string
 	baseURL *string
+	tls     *bool
 	file    *string
 	db      *string
 }
@@ -31,6 +33,7 @@ const addr = "localhost:8080"
 func init() {
 	f.host = flag.String("a", addr, "-a=host")
 	f.baseURL = flag.String("b", "http://localhost:8080/", "-b=base")
+	f.tls = flag.Bool("s", false, "-t=")
 	f.file = flag.String("f", "qwe", "-f=storage")
 	f.db = flag.String("d", "", "-d=db")
 }
@@ -43,6 +46,9 @@ func New() (c Config) {
 	}
 	if envBaseAddr := os.Getenv("BASE_URL"); envBaseAddr != "" {
 		f.baseURL = &envBaseAddr
+	}
+	if envTLS := os.Getenv("ENABLE_HTTPS"); envTLS != "" {
+		f.baseURL = &envTLS
 	}
 	if envFile := os.Getenv("FILE_STORAGE_PATH"); envFile != "" {
 		f.file = &envFile
@@ -65,6 +71,7 @@ func New() (c Config) {
 		return fmt.Sprintf("%s/", *f.baseURL)
 	}()
 	c.File = *f.file
+	c.TLS = *f.tls
 	c.DB = *f.db
 	return c
 
