@@ -1,20 +1,23 @@
 package config
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 )
 
 // Config sa
 type Config struct {
-	Host    string
-	BaseURL string
-	TLS     bool
-	File    string
-	DB      string
+	Host    string `json:"server_address"`
+	BaseURL string `json:"base_url"`
+	TLS     bool   `json:"enable_https"`
+	File    string `json:"file_storage_path"`
+	DB      string `json:"database_dsn"`
 	Storage string
+	CFile   string
 }
 
 // F sa
@@ -24,6 +27,7 @@ type F struct {
 	tls     *bool
 	file    *string
 	db      *string
+	cFile   *string
 }
 
 var f F
@@ -36,6 +40,7 @@ func init() {
 	f.tls = flag.Bool("s", false, "-t=")
 	f.file = flag.String("f", "qwe", "-f=storage")
 	f.db = flag.String("d", "", "-d=db")
+	f.cFile = flag.String("c", "", "-c=")
 }
 
 // New sa
@@ -56,6 +61,9 @@ func New() (c Config) {
 	if envDB := os.Getenv("DATABASE_DSN"); envDB != "" {
 		f.db = &envDB
 	}
+	if envConfig := os.Getenv("CONFIG"); envConfig != "" {
+		f.cFile = &envConfig
+	}
 	if *f.file != "qwe" {
 		c.Storage = "file"
 	}
@@ -73,6 +81,22 @@ func New() (c Config) {
 	c.File = *f.file
 	c.TLS = *f.tls
 	c.DB = *f.db
+	c.CFile = *f.cFile
+	file, err := os.Open(c.CFile)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	all, err := io.ReadAll(file)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(all, &c)
+	if err != nil {
+		return
+	}
 	return c
 
 }
