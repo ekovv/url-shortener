@@ -32,6 +32,16 @@ func (s *DBStorage) GetLastID() (int, error) {
 	return 0, nil
 }
 
+// ShutDown storage
+func (s *DBStorage) ShutDown() error {
+	if err := s.conn.Close(); err != nil {
+		return fmt.Errorf("error closing db: %w", err)
+	}
+
+	return nil
+
+}
+
 // NewDBStorage constructor
 func NewDBStorage(config config.Config) (*DBStorage, error) {
 	db, err := sql.Open("postgres", config.DB)

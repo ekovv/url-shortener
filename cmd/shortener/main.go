@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"url-shortener/config"
 	"url-shortener/internal/handler"
 	myLog "url-shortener/internal/logger"
@@ -46,6 +49,17 @@ func main() {
 	}
 	defer logger.Sync()
 	myLog.Sugar = *logger.Sugar()
-	h.Start()
-	stM.Close()
+	go func() {
+		h.Start()
+		stM.Close()
+	}()
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	<-quit
+	fmt.Println("ShutDown")
+	err = stM.ShutDown()
+	if err != nil {
+		log.Println("Failed to shutdown storage: ", err)
+	}
+
 }
