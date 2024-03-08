@@ -35,6 +35,11 @@ func (s *MapStorage) Close() error {
 	return nil
 }
 
+// ShutDown  mapClose
+func (s *MapStorage) ShutDown() error {
+	panic("implement me")
+}
+
 // NewMapStorage constructor
 func NewMapStorage() *MapStorage {
 	return &MapStorage{

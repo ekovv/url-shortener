@@ -15,6 +15,7 @@ type Storage interface {
 	GetAll(user int) ([]URL, error)
 	GetLastID() (int, error)
 	DeleteUrls(list []string, user int) error
+	ShutDown() error
 }
 
 // New sa

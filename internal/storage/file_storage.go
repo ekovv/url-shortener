@@ -56,13 +56,21 @@ func NewFileStorage(path string) (*FileStorage, error) {
 	return fs, nil
 }
 
-// Open open file
+// Open  file
 func (s *FileStorage) Open() error {
 	file, err := os.OpenFile(s.Path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
 		return err
 	}
 	s.File = file
+	return nil
+}
+
+// ShutDown file
+func (s *FileStorage) ShutDown() error {
+	if err := s.File.Close(); err != nil {
+		return fmt.Errorf("error closing file: %w", err)
+	}
 	return nil
 }
 
